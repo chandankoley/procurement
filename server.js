@@ -1,6 +1,5 @@
 var express = require('express');
 var app = express();
-var mongo = require('./mongo');
 const PORT_NO = process.env.PORT || 8080;
 
 app.use('/status', function (req, res) {

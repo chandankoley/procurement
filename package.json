@@ -3,14 +3,17 @@
     "version": "1.0.0",
     "description": "A application which manages required items daily basis",
     "engines": {
-      "node": "12.14.1",
-      "npm": "6.13.4"
+        "node": "12.14.1",
+        "npm": "6.13.4"
     },
     "dependencies": {
-      "express": "4.16.3",
-      "mongodb": "^4.13.0"
+        "body-parser": "^1.20.1",
+        "express": "4.16.3",
+        "fs": "^0.0.1-security",
+        "lodash": "^4.17.21",
+        "mongodb": "^4.13.0"
     },
     "scripts": {
-      "start": "node server.js"
+        "start": "node server.js"
     }
 }

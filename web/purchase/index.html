@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<head>
+    <title>Inventory Manager</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@3.10.1/index.js"></script>
+    <script src="public/purchase/app.js"></script>
+    <script src="public/purchase/dbHandler.js"></script>
+    
+</head>
+<style>
+
+</style>
+<body ng-app="purchaseApp" ng-controller="purchaseController">
+    
+<div>  
+
+  <nav class="navbar navbar-light bg-light">
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="material-icons">view_list</span>
+        <span style="vertical-align: super;">Menu</span>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" ng-click="page.open = 'wishlist'">
+          <span class="material-icons">shopping_cart</span>
+          <span style="vertical-align: super;">Wishlist</span>
+        </a>
+        <a class="dropdown-item" ng-click="page.open = 'purchase'">
+          <span class="material-icons">receipt</span>
+          <span style="vertical-align: super;">Purchase Details</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Button trigger modal -->
+    <button type  = "button" class = "btn btn-success" data-toggle = "modal" data-target = "#shoppingItem" style = "float: right">
+      <span class = "material-icons">shopping_bag</span>
+    </button>
+  </nav>
+
+  <div class="wishlist" ng-show="page.open === 'wishlist'">
+    wishlist page
+  </div>
+
+  <div class="purchase" ng-show="page.open === 'purchase'">
+
+    <div ng-repeat="dataObj in page.purchaselist.data" class="card" style="margin: 1rem;">
+      <h4 class="card-title" style="margin: 10px;">
+        <span class="material-icons">verified</span>
+        {{dataObj.title}}
+      </h4>
+      <span class="badge badge-info">{{dataObj.type}}</span>
+      <ul class="list-group list-group-flush">
+        <li ng-repeat="obj in dataObj.details" class="list-group-item">
+          <span class="badge badge-light">{{obj.date}}</span>
+          <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
+          <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
+          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;">delete</span>
+          <span class="material-icons" ng-click="newItemDialog.editItem(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">edit</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="shoppingItem" tabindex="-1" role="dialog" aria-labelledby="shoppingItemTitle" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLongTitle">Item Details</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="input-group mb-3">
+        <input type="text" ng-model="newItemDialog.title" class="form-control" placeholder="Item name" aria-label="Item name" aria-describedby="basic-addon2">
+        <select class="custom-select" id="typeSelection" ng-model="newItemDialog.type">
+          <option ng-repeat="obj in newItemDialog.formOptions.itemType.list" value="{{obj.id}}">{{obj.value}}</option>
+        </select>
+      </div>
+
+      <div class="input-group mb-3">
+        <input type="number" ng-model="newItemDialog.quantity" class="form-control" placeholder="Total unit" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <select class="custom-select" id="measurementUnit" ng-model="newItemDialog.unit">
+          <option ng-repeat="obj in newItemDialog.formOptions.itemUnit.list" value="{{obj.id}}">{{obj.value}}</option>
+        </select>
+      </div>
+
+      <input type="number" ng-model="newItemDialog.price" class="form-control" placeholder="Price" aria-label="Recipient's username" aria-describedby="basic-addon2">
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Purchase</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal">Wishlist</button>
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+</div>
+
+  
+<!--
+    <div>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="/purchase">Purchase</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/wishlist">Wishlist</a>
+            </li>
+        </ul>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <nav class="navbar navbar-light bg-light">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Action
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                          <a class="dropdown-item">All Item</a>
+                          <a class="dropdown-item">Last 30 days</a>
+                          <a class="dropdown-item">Current Month</a>
+                        </div>
+                    </div>
+                    <form class="form-inline">
+                      <input class="form-control mr-sm-2" type="search" placeholder="Search Item" aria-label="Search" ng-model="searchItem">
+                      <button class="btn btn-outline-success my-2 my-sm-0" type="submit" ng-click="getItemList(searchItem)">Search</button>
+                    </form>
+                </nav>
+            </div>
+            <div class="panel-body">
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="item in purchaseList">
+                        <h4>{{item.title}}</h4>
+                        <span class="badge badge-secondary">Purchased on: {{item.date}}</span>
+                        <span class="badge badge-secondary">Quantity: {{item.quantity}} {{item.unit}} @{{item.price}}/-</span>
+                        <span class="badge badge-primary">{{getUnitPrice(item.unit, item.quantity, item.price)}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+-->
+</body>
+</html>

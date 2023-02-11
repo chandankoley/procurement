@@ -41,7 +41,7 @@
     </div>
 
     <!-- Button trigger modal -->
-    <button type  = "button" class = "btn btn-success" data-toggle = "modal" data-target = "#shoppingItem" style = "float: right">
+    <button type  = "button" class = "btn btn-success" data-toggle = "modal" data-target = "#shoppingItem" style = "float: right" ng-click="newItemDialog.loadItemDetailsDialog({}, 'new-purchase-wishlist');">
       <span class = "material-icons">shopping_bag</span>
     </button>
   </nav>
@@ -56,15 +56,17 @@
       <h4 class="card-title" style="margin: 10px;">
         <span class="material-icons">verified</span>
         {{dataObj.title}}
+        <span class="material-icons" style="float: right;">bookmark_added</span>
       </h4>
+      <span style="font-size: x-small; margin: 5px;">{{dataObj.desc}}</span>
       <span class="badge badge-info">{{dataObj.type}}</span>
       <ul class="list-group list-group-flush">
         <li ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="badge badge-light">{{obj.date}}</span>
           <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
           <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
-          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;">delete</span>
-          <span class="material-icons" ng-click="newItemDialog.editItem(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">edit</span>
+          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;">delete_forever</span>
+          <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
         </li>
       </ul>
     </div>
@@ -93,7 +95,10 @@
         </select>
       </div>
 
+      <textarea class="form-control" aria-label="With textarea" placeholder="Item Description" ng-model="newItemDialog.desc"></textarea>
+
       <div class="input-group mb-3">
+        <input type="text" ng-model="newItemDialog.date" class="form-control" placeholder="DD/MM/YYYY" aria-label="Item name" aria-describedby="basic-addon2">
         <input type="number" ng-model="newItemDialog.quantity" class="form-control" placeholder="Total unit" aria-label="Recipient's username" aria-describedby="basic-addon2">
         <select class="custom-select" id="measurementUnit" ng-model="newItemDialog.unit">
           <option ng-repeat="obj in newItemDialog.formOptions.itemUnit.list" value="{{obj.id}}">{{obj.value}}</option>
@@ -102,67 +107,35 @@
 
       <input type="number" ng-model="newItemDialog.price" class="form-control" placeholder="Price" aria-label="Recipient's username" aria-describedby="basic-addon2">
 
+      <span style="color: red; font-size: x-small;margin-top: 5px;">**Only Item title, type and decription will get added in wishlist.</span>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-primary" data-dismiss="modal">Purchase</button>
-      <button type="button" class="btn btn-primary" data-dismiss="modal">Wishlist</button>
-      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewPurchase" type="button" class="btn btn-success btn-sm" data-dismiss="modal" ng-click="newItemDialog.addPurchaseItem();">
+        <span class="material-icons">add</span> Purchase
+      </button>
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.editPurchase" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">
+        <span class="material-icons">update</span> Purchase
+      </button>
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewWish" type="button" class="btn btn-success btn-sm" data-dismiss="modal">
+        <span class="material-icons">add</span> Wish
+      </button>
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.editWish" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">
+        <span class="material-icons">update</span> Wish
+      </button>
     </div>
   </div>
 </div>
 </div>
 
 
-
+<div ng-if="alertHandler.showAlert === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px;">
+  {{alertHandler.message}}
+  <button type="button" class="close" aria-label="Close" ng-click="alertHandler.showAlert = false">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
 
 </div>
 
-  
-<!--
-    <div>
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" href="/purchase">Purchase</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/wishlist">Wishlist</a>
-            </li>
-        </ul>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <nav class="navbar navbar-light bg-light">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Action
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                          <a class="dropdown-item">All Item</a>
-                          <a class="dropdown-item">Last 30 days</a>
-                          <a class="dropdown-item">Current Month</a>
-                        </div>
-                    </div>
-                    <form class="form-inline">
-                      <input class="form-control mr-sm-2" type="search" placeholder="Search Item" aria-label="Search" ng-model="searchItem">
-                      <button class="btn btn-outline-success my-2 my-sm-0" type="submit" ng-click="getItemList(searchItem)">Search</button>
-                    </form>
-                </nav>
-            </div>
-            <div class="panel-body">
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="item in purchaseList">
-                        <h4>{{item.title}}</h4>
-                        <span class="badge badge-secondary">Purchased on: {{item.date}}</span>
-                        <span class="badge badge-secondary">Quantity: {{item.quantity}} {{item.unit}} @{{item.price}}/-</span>
-                        <span class="badge badge-primary">{{getUnitPrice(item.unit, item.quantity, item.price)}}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-
-
--->
 </body>
 </html>

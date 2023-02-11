@@ -52,6 +52,15 @@
 
   <div class="purchase" ng-show="page.open === 'purchase'">
 
+    <div class="input-group mb-3" style="margin-bottom: 0px !important;">
+      <input type="text" ng-model="page.purchaselist.search.titleStr" class="form-control" placeholder="Type item title" aria-label="Item name" aria-describedby="basic-addon2">
+      <button type="button" class="btn btn-primary btn-sm" ng-click="page.purchaselist.search.findPurchasedItems()">
+        <span class="material-icons">search</span> 
+        <span style="vertical-align: super;">Find</span>
+      </button>
+    </div>
+
+    <span ng-show="page.purchaselist.searchSummary !== ''" class="badge badge-pill badge-dark">{{page.purchaselist.searchSummary}}</span>
     <div ng-repeat="dataObj in page.purchaselist.data" class="card" style="margin: 1rem;">
       <h4 class="card-title" style="margin: 10px;">
         <span class="material-icons">verified</span>
@@ -88,39 +97,43 @@
     </div>
     <div class="modal-body">
 
+      <input type="text" ng-model="newItemDialog.title" class="form-control" placeholder="Item name" aria-label="Item name" aria-describedby="basic-addon2">
+
+      <textarea style="margin: 1rem 0px;" class="form-control" aria-label="With textarea" placeholder="Item Description" ng-model="newItemDialog.desc"></textarea>
+
       <div class="input-group mb-3">
-        <input type="text" ng-model="newItemDialog.title" class="form-control" placeholder="Item name" aria-label="Item name" aria-describedby="basic-addon2">
         <select class="custom-select" id="typeSelection" ng-model="newItemDialog.type">
           <option ng-repeat="obj in newItemDialog.formOptions.itemType.list" value="{{obj.id}}">{{obj.value}}</option>
         </select>
-      </div>
-
-      <textarea class="form-control" aria-label="With textarea" placeholder="Item Description" ng-model="newItemDialog.desc"></textarea>
-
-      <div class="input-group mb-3">
-        <input type="text" ng-model="newItemDialog.date" class="form-control" placeholder="DD/MM/YYYY" aria-label="Item name" aria-describedby="basic-addon2">
         <input type="number" ng-model="newItemDialog.quantity" class="form-control" placeholder="Total unit" aria-label="Recipient's username" aria-describedby="basic-addon2">
         <select class="custom-select" id="measurementUnit" ng-model="newItemDialog.unit">
           <option ng-repeat="obj in newItemDialog.formOptions.itemUnit.list" value="{{obj.id}}">{{obj.value}}</option>
         </select>
       </div>
 
-      <input type="number" ng-model="newItemDialog.price" class="form-control" placeholder="Price" aria-label="Recipient's username" aria-describedby="basic-addon2">
+      <div class="input-group mb-3">
+        <input type="text" ng-model="newItemDialog.date" class="form-control" placeholder="DD/MM/YYYY" aria-label="Item name" aria-describedby="basic-addon2">
+        <input type="number" ng-model="newItemDialog.price" class="form-control" placeholder="Price" aria-label="Recipient's username" aria-describedby="basic-addon2">
+      </div>
 
       <span style="color: red; font-size: x-small;margin-top: 5px;">**Only Item title, type and decription will get added in wishlist.</span>
     </div>
     <div class="modal-footer">
       <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewPurchase" type="button" class="btn btn-success btn-sm" data-dismiss="modal" ng-click="newItemDialog.addPurchaseItem();">
-        <span class="material-icons">add</span> Purchase
+        <span class="material-icons">add</span>
+        <span style="vertical-align: super;">Purchase</span>
       </button>
       <button ng-if="newItemDialog.formOptions.isButtonVisible.editPurchase" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">
-        <span class="material-icons">update</span> Purchase
+        <span class="material-icons">update</span>
+        <span style="vertical-align: super;">Purchase</span>
       </button>
       <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewWish" type="button" class="btn btn-success btn-sm" data-dismiss="modal">
-        <span class="material-icons">add</span> Wish
+        <span class="material-icons">add</span>
+        <span style="vertical-align: super;">Wish</span>
       </button>
       <button ng-if="newItemDialog.formOptions.isButtonVisible.editWish" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">
-        <span class="material-icons">update</span> Wish
+        <span class="material-icons">update</span>
+        <span style="vertical-align: super;">Wish</span>
       </button>
     </div>
   </div>

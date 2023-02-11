@@ -1,10 +1,11 @@
 app.factory('dbData', function ($http) {
 
-    var getPurchaseItemList = function(){
+    var getPurchaseItemList = function(params){
 		var req = {
-			method: 'GET',
+			method: 'POST',
 			url: '/api/get-purchase-item',
-			timeout: 20000
+			timeout: 20000,
+			data: params
 		};
 		return $http(req);
 	};

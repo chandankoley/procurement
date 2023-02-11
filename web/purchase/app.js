@@ -6,6 +6,23 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         open: "wishlist",
         wishlist: {},
         purchaselist: {
+            search: {
+                titleStr: '',
+                findPurchasedItems: function() {
+                    var params = {
+                        titleStr: this.titleStr.toLowerCase()
+                    };
+                    $scope.page.purchaselist.searchSummary = 'Searching your item. Please wait...';
+                    dbData.getPurchaseItemList(params).then(function(res){
+                        $scope.page.purchaselist.data = res.data;
+                        $scope.page.purchaselist.searchSummary = 'Found ' + res.data.length + ' items according to your search filter' ;
+                    }).catch(function(e){
+                        console.error(e);
+                        $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
+                    });
+                }
+            },
+            searchSummary: '',
             data: null
         }
     };
@@ -28,7 +45,9 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 list: [
                     {id: "grocery", value: "Grocery"},
                     {id: "vegetable", value: "Vegetable"},
-                    {id: "fruit", value: "Fruit"}
+                    {id: "fruit", value: "Fruit"},
+                    {id: "furniture", value: "Furniture"},
+                    {id: "others", value: "Others"}
                 ]
             },
             itemUnit: {
@@ -133,13 +152,6 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             }
         }
     };
-
-
-
-    dbData.getPurchaseItemList().then(function(res){
-        console.log("purchaseList::", res.data);
-        $scope.page.purchaselist.data = res.data;
-    });
 
     $scope.alertHandler = {
         showAlert: false,

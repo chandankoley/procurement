@@ -74,7 +74,7 @@
           <span class="badge badge-light">{{obj.date}}</span>
           <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
           <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
-          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;">delete_forever</span>
+          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'purchase');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
         </li>
       </ul>
@@ -141,11 +141,17 @@
 </div>
 
 
-<div ng-if="alertHandler.showAlert === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px;">
+<div ng-if="alertHandler.showAlert === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px; z-index: 100;">
   {{alertHandler.message}}
   <button type="button" class="close" aria-label="Close" ng-click="alertHandler.showAlert = false">
     <span aria-hidden="true">&times;</span>
   </button>
+</div>
+
+<div ng-if="confirmHandler.showConfirm === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px; z-index: 100;">
+  {{confirmHandler.message}}
+  <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.showConfirm = false">close</span>
+  <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.onConfirm()">done</span>
 </div>
 
 </div>

@@ -153,6 +153,32 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         }
     };
 
+    $scope.onItemDelete = function(itemObj, target) {
+        if(target === 'purchase'){
+            $scope.confirmHandler.message = "Are you sure to delete '" + itemObj.title + "' purchased on " + itemObj.date + " ?";
+            $scope.confirmHandler.showConfirm = true;
+            $scope.confirmHandler.onConfirm = function() {
+                console.log("delete purchase::", itemObj, target);
+                $scope.confirmHandler.showConfirm = false;
+                dbData.deletePurchaseItem({id: itemObj.id}).then(function(){
+                    $scope.alertHandler.triggerAlert('Item deleted successfully', 5);
+                }).catch(function(e){
+                    console.error("Item failed to delete::", e);
+                    $scope.alertHandler.triggerAlert('Failed to delete purchased Item', 5);
+                });
+            }
+        } else if(target === 'wish'){
+            $scope.confirmHandler.message = "Are you sure to delete '" + itemObj.title + "' from wishlist?";
+            $scope.confirmHandler.showConfirm = true;
+            $scope.confirmHandler.onConfirm = function() {
+                console.log("delete wish::", itemObj, target);
+                $scope.confirmHandler.showConfirm = false;
+            }
+        } else {
+            console.log('Invalid operation');
+        }
+    };
+
     $scope.alertHandler = {
         showAlert: false,
         message: '',
@@ -165,4 +191,12 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             }, showtime * 1000);
         }
     };
+
+    $scope.confirmHandler = {
+        showConfirm: false,
+        message: '',
+        onConfirm: function() {
+            console.log("Override this method to do something...");
+        }
+    }
 });

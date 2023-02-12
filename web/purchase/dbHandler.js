@@ -20,8 +20,19 @@ app.factory('dbData', function ($http) {
 		return $http(req);
 	};
 
+	var deletePurchaseItem = function(params){
+		var req = {
+			method: 'POST',
+			url: '/api/delete-purchase-item',
+			timeout: 20000,
+			data: params
+		};
+		return $http(req);
+	};
+
     return {
         getPurchaseItemList: getPurchaseItemList,
-		addPurchaseItem: addPurchaseItem
+		addPurchaseItem: addPurchaseItem,
+		deletePurchaseItem: deletePurchaseItem
     };
 });

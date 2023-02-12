@@ -8,6 +8,7 @@ var MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
 const DB_NAME = "inventory";
 const PURCHASE_TABLE = "purchase";
+const WISH_TABLE = "wish";
 
 router.use('/public',express.static(path.join(__dirname, '../../web')));
 
@@ -68,6 +69,62 @@ router.post('/api/delete-purchase-item', function (req, res) {
         if (err) 
             res.sendStatus(500);
             db.db(DB_NAME).collection(PURCHASE_TABLE).deleteOne(req.body, function(err) {
+            if (err) 
+                res.sendStatus(500);
+            else
+                res.sendStatus(200);
+            db.close();
+        });
+    });
+});
+
+router.post('/api/add-wish-item', function (req, res) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+            db.db(DB_NAME).collection(WISH_TABLE).insertOne(req.body, function(err) {
+            if (err) 
+                res.sendStatus(500);
+            else
+                res.sendStatus(200);
+            db.close();
+        });
+    });
+});
+
+router.get('/api/get-wish-item', function (req, res) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+            db.db(DB_NAME).collection(WISH_TABLE).find().toArray(function (err, dbData) {
+                if (err) {
+                    res.sendStatus(500);
+                } else {
+                    dbData = _.chain(dbData).orderBy(['type', 'title'], ['asc', 'asc']).reduce(function(memo, obj) {
+                        var formattedType = obj.type.charAt(0).toUpperCase() + obj.type.slice(1);
+                        var index = _.findIndex(memo, {'type': formattedType});
+                        if(index >= 0){
+                            memo[index].details.push(obj);
+                        } else {
+                            memo.push({
+                                'type': formattedType,
+                                'details': [obj]
+                            });
+                        }
+                        return memo;
+                    }, []).value();
+                    res.send(dbData);
+                }
+                db.close();
+            });
+    });
+});
+
+router.post('/api/delete-wish-item', function (req, res) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+            db.db(DB_NAME).collection(WISH_TABLE).deleteOne(req.body, function(err) {
             if (err) 
                 res.sendStatus(500);
             else

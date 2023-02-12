@@ -30,9 +30,41 @@ app.factory('dbData', function ($http) {
 		return $http(req);
 	};
 
+	var getWishItemList = function(){
+		var req = {
+			method: 'GET',
+			url: '/api/get-wish-item',
+			timeout: 20000
+		};
+		return $http(req);
+	};
+
+	var addWishItem = function(params){
+		var req = {
+			method: 'POST',
+			url: '/api/add-wish-item',
+			timeout: 20000,
+			data: params
+		};
+		return $http(req);
+	};
+
+	var deleteWishItem = function(params){
+		var req = {
+			method: 'POST',
+			url: '/api/delete-wish-item',
+			timeout: 20000,
+			data: params
+		};
+		return $http(req);
+	};
+
     return {
         getPurchaseItemList: getPurchaseItemList,
 		addPurchaseItem: addPurchaseItem,
-		deletePurchaseItem: deletePurchaseItem
+		deletePurchaseItem: deletePurchaseItem,
+		getWishItemList: getWishItemList,
+		addWishItem: addWishItem,
+		deleteWishItem: deleteWishItem
     };
 });

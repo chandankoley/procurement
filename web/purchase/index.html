@@ -47,7 +47,28 @@
   </nav>
 
   <div class="wishlist" ng-show="page.open === 'wishlist'">
-    wishlist page
+    
+    <span ng-show="page.wishlist.searchSummary !== ''" class="badge badge-pill badge-dark">{{page.wishlist.searchSummary}}</span>
+    <button type="button" class="btn btn-light btn-sm" ng-click="page.wishlist.search.findWishlistItems()">
+      <span class="material-icons">refresh</span> 
+      <span style="vertical-align: super;">Refresh</span>
+    </button>
+
+    <div ng-repeat="dataObj in page.wishlist.data" class="card" style="margin: 1rem;">
+      <h4 class="card-title" style="margin: 10px;">
+        <span class="material-icons">verified</span>
+        {{dataObj.type}}
+      </h4>
+      <ul class="list-group list-group-flush">
+        <li ng-repeat="obj in dataObj.details" class="list-group-item">
+          <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
+          <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
+          <div>{{obj.title}}</div>
+          <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
+        </li>
+      </ul>
+    </div>
+
   </div>
 
   <div class="purchase" ng-show="page.open === 'purchase'">
@@ -61,6 +82,7 @@
     </div>
 
     <span ng-show="page.purchaselist.searchSummary !== ''" class="badge badge-pill badge-dark">{{page.purchaselist.searchSummary}}</span>
+
     <div ng-repeat="dataObj in page.purchaselist.data" class="card" style="margin: 1rem;">
       <h4 class="card-title" style="margin: 10px;">
         <span class="material-icons">verified</span>
@@ -127,7 +149,7 @@
         <span class="material-icons">update</span>
         <span style="vertical-align: super;">Purchase</span>
       </button>
-      <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewWish" type="button" class="btn btn-success btn-sm" data-dismiss="modal">
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewWish" type="button" class="btn btn-success btn-sm" data-dismiss="modal" ng-click="newItemDialog.addWishItem();">
         <span class="material-icons">add</span>
         <span style="vertical-align: super;">Wish</span>
       </button>

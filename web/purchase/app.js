@@ -143,9 +143,36 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }
                 dbData.addPurchaseItem(params).then(function(){
                     $scope.alertHandler.triggerAlert('New purchased Item added successfully', 5);
+                    $scope.page.purchaselist.search.findPurchasedItems();
                 }).catch(function(e){
                     console.error("Item failed to add::", e);
                     $scope.alertHandler.triggerAlert('Failed to add purchased Item', 5);
+                });
+            } else {
+                $scope.alertHandler.triggerAlert(validCheck.reason, 5);
+            }
+        },
+        updatePurchaseItem: function() {
+            var validCheck = this.validateData();
+            if(validCheck.isValid) {
+                var params = {
+                    id: this.id,
+                    title: this.title,
+                    desc: this.desc,
+                    date: moment(this.date, 'DD/MM/YYYY').format('YYYYMMDD'),
+                    type: this.type,
+                    quantity: this.quantity,
+                    unit: this.unit,
+                    price: this.price
+                }
+                dbData.deletePurchaseItem({id: params.id}).then(function(){
+                    return dbData.addPurchaseItem(params);
+                }).then(function(){
+                    $scope.alertHandler.triggerAlert('Purchased Item updated successfully', 5);
+                    $scope.page.purchaselist.search.findPurchasedItems();
+                }).catch(function(e){
+                    console.error("Item failed to update::", e);
+                    $scope.alertHandler.triggerAlert('Failed to update purchased Item', 5);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -162,6 +189,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 $scope.confirmHandler.showConfirm = false;
                 dbData.deletePurchaseItem({id: itemObj.id}).then(function(){
                     $scope.alertHandler.triggerAlert('Item deleted successfully', 5);
+                    $scope.page.purchaselist.search.findPurchasedItems();
                 }).catch(function(e){
                     console.error("Item failed to delete::", e);
                     $scope.alertHandler.triggerAlert('Failed to delete purchased Item', 5);

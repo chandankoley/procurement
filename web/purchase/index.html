@@ -123,7 +123,7 @@
         <span class="material-icons">add</span>
         <span style="vertical-align: super;">Purchase</span>
       </button>
-      <button ng-if="newItemDialog.formOptions.isButtonVisible.editPurchase" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">
+      <button ng-if="newItemDialog.formOptions.isButtonVisible.editPurchase" type="button" class="btn btn-primary btn-sm" data-dismiss="modal" ng-click="newItemDialog.updatePurchaseItem();">
         <span class="material-icons">update</span>
         <span style="vertical-align: super;">Purchase</span>
       </button>

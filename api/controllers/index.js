@@ -78,20 +78,6 @@ router.post('/api/delete-purchase-item', function (req, res) {
     });
 });
 
-router.post('/api/add-wish-item', function (req, res) {
-    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
-        if (err) 
-            res.sendStatus(500);
-            db.db(DB_NAME).collection(WISH_TABLE).insertOne(req.body, function(err) {
-            if (err) 
-                res.sendStatus(500);
-            else
-                res.sendStatus(200);
-            db.close();
-        });
-    });
-});
-
 router.get('/api/get-wish-item', function (req, res) {
     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
         if (err) 
@@ -117,6 +103,20 @@ router.get('/api/get-wish-item', function (req, res) {
                 }
                 db.close();
             });
+    });
+});
+
+router.post('/api/add-wish-item', function (req, res) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+            db.db(DB_NAME).collection(WISH_TABLE).insertOne(req.body, function(err) {
+            if (err) 
+                res.sendStatus(500);
+            else
+                res.sendStatus(200);
+            db.close();
+        });
     });
 });
 

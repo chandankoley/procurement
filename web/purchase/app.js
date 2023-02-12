@@ -76,7 +76,8 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 addNewPurchase: false,
                 addNewWish: false,
                 editPurchase: false,
-                editWish: false
+                editWish: false,
+                moveWishToPurchase: false
             }
         },
         loadItemDetailsDialog: function (itemObj, action) {
@@ -93,6 +94,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.formOptions.isButtonVisible.addNewWish = true;
                 this.formOptions.isButtonVisible.editPurchase = false;
                 this.formOptions.isButtonVisible.editWish = false;
+                this.formOptions.isButtonVisible.moveWishToPurchase = false;
             } else if(action === 'edit-purchase') {
                 this.id = itemObj.id;
                 this.title = itemObj.title;
@@ -106,6 +108,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.formOptions.isButtonVisible.addNewWish = true;
                 this.formOptions.isButtonVisible.editPurchase = true;
                 this.formOptions.isButtonVisible.editWish = false;
+                this.formOptions.isButtonVisible.moveWishToPurchase = false;
             } else if(action === 'edit-wishlist') {
                 this.id = itemObj.id;
                 this.title = itemObj.title;
@@ -119,6 +122,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.formOptions.isButtonVisible.addNewWish = false;
                 this.formOptions.isButtonVisible.editPurchase = false;
                 this.formOptions.isButtonVisible.editWish = true;
+                this.formOptions.isButtonVisible.moveWishToPurchase = true;
             } else {
                 /*Invalid action*/
             }
@@ -128,7 +132,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 isValid: true,
                 reason: ''
             };
-            if(_.indexOf(validItem, 'title') >= 0 && this.title === '') {
+            if(_.indexOf(validItem, 'title') >= 0 && (this.title == '' || this.title == null)) {
                 result.isValid = false;
                 result.reason = 'Please provide product title'
             } else if(_.indexOf(validItem, 'date') >= 0 && !moment(this.date, 'DD-MM-YYYY').isValid()) {
@@ -140,11 +144,17 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             } else if(_.indexOf(validItem, 'price') >= 0 && (this.price == null || parseFloat(this.price) <= 0)) {
                 result.isValid = false;
                 result.reason = 'Please provide valid price'
-            } 
+            } else if(_.indexOf(validItem, 'type') >= 0 && (this.type == '' || this.type == null)) {
+                result.isValid = false;
+                result.reason = 'Please provide product type details'
+            } else if(_.indexOf(validItem, 'unit') >= 0 && (this.unit === '' || this.unit == null)) {
+                result.isValid = false;
+                result.reason = 'Please provide product unit details'
+            }
             return result;
         },
         addPurchaseItem: function() {
-            var validCheck = this.validateData(['title', 'date', 'quantity', 'price']);
+            var validCheck = this.validateData(['title', 'date', 'quantity', 'price', 'type', 'unit']);
             if(validCheck.isValid) {
                 var params = {
                     id: 'ITEM_' + moment().format('x'),
@@ -168,7 +178,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             }
         },
         updatePurchaseItem: function() {
-            var validCheck = this.validateData(['title', 'date', 'quantity', 'price']);
+            var validCheck = this.validateData(['title', 'date', 'quantity', 'price', 'type', 'unit']);
             if(validCheck.isValid) {
                 var params = {
                     id: this.id,
@@ -194,7 +204,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             }
         },
         addWishItem: function() {
-            var validCheck = this.validateData(['title']);
+            var validCheck = this.validateData(['title', 'type']);
             if(validCheck.isValid) {
                 var params = {
                     id: 'ITEM_' + moment().format('x'),
@@ -213,6 +223,55 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
             }
         },
+        updateWishItem: function() {
+            var validCheck = this.validateData(['title']);
+            if(validCheck.isValid) {
+                var params = {
+                    id: this.id,
+                    title: this.title,
+                    type: this.type,
+                    desc: this.desc
+                }
+                dbData.deleteWishItem({id: params.id}).then(function(){
+                    return dbData.addWishItem(params);
+                }).then(function(){
+                    $scope.alertHandler.triggerAlert('Wish Item updated successfully', 5);
+                    $scope.page.wishlist.search.findWishlistItems();
+                }).catch(function(e){
+                    console.error("Item failed to update::", e);
+                    $scope.alertHandler.triggerAlert('Failed to update wish item', 5);
+                });
+            } else {
+                $scope.alertHandler.triggerAlert(validCheck.reason, 5);
+            }
+        },
+        moveWishToPurchase: function() {
+            var validCheck = this.validateData(['title', 'date', 'quantity', 'price', 'type', 'unit']);
+            if(validCheck.isValid) {
+                var params = {
+                    id: this.id,
+                    title: this.title,
+                    desc: this.desc,
+                    date: moment(this.date, 'DD/MM/YYYY').format('YYYYMMDD'),
+                    type: this.type,
+                    quantity: this.quantity,
+                    unit: this.unit,
+                    price: this.price
+                }
+                dbData.deleteWishItem({id: params.id}).then(function(){
+                    return dbData.addPurchaseItem(params);
+                }).then(function(){
+                    $scope.alertHandler.triggerAlert('Removed Item from wishlist and add to Purchased Item successfully', 5);
+                    $scope.page.purchaselist.search.findPurchasedItems();
+                    $scope.page.wishlist.search.findWishlistItems();
+                }).catch(function(e){
+                    console.error("Item failed to update::", e);
+                    $scope.alertHandler.triggerAlert('Failed to Remove Item from wishlist and add to Purchased Item', 5);
+                });
+            } else {
+                $scope.alertHandler.triggerAlert(validCheck.reason, 5);
+            }
+        }
     };
 
     $scope.onItemDelete = function(itemObj, target) {
@@ -239,6 +298,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 dbData.deleteWishItem({id: itemObj.id}).then(function(){
                     $scope.alertHandler.triggerAlert('Item deleted successfully', 5);
                     $scope.page.wishlist.search.findWishlistItems();
+                    $scope.page.purchaselist.search.findPurchasedItems();
                 }).catch(function(e){
                     console.error("Item failed to delete::", e);
                     $scope.alertHandler.triggerAlert('Failed to delete wish item', 5);
@@ -269,4 +329,8 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             console.log("Override this method to do something...");
         }
     }
+
+    //onload calls
+    $scope.page.wishlist.search.findWishlistItems();
+    $scope.page.purchaselist.search.findPurchasedItems();
 });

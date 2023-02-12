@@ -309,6 +309,16 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         }
     };
 
+    $scope.onItemImportant = function(itemObj) {
+        var isImportant = itemObj.important && itemObj.important === 'true' ? 'false' : 'true'
+        dbData.updateWishImportantFlag({id: itemObj.id, isImportant: isImportant}).then(function(){
+            $scope.page.wishlist.search.findWishlistItems();
+        }).catch(function(e){
+            console.error("Item failed to delete::", e);
+            $scope.alertHandler.triggerAlert('Failed to update importance of wish item', 5);
+        });
+    };
+
     $scope.alertHandler = {
         showAlert: false,
         message: '',

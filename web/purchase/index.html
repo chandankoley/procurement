@@ -63,7 +63,10 @@
         <li ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
-          <div>{{obj.title}}</div>
+          <div ng-click="onItemImportant(obj)">
+            <span ng-show="obj.important === 'true'" class="material-icons">task_alt</span>
+            <span style="vertical-align: super;">{{obj.title}}</span>
+          </div>
           <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
         </li>
       </ul>

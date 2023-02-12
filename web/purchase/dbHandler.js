@@ -59,12 +59,23 @@ app.factory('dbData', function ($http) {
 		return $http(req);
 	};
 
+	var updateWishImportantFlag = function(params){
+		var req = {
+			method: 'GET',
+			url: '/api/update-wish-item-important-flag?id=' + params.id + '&isImportant=' + params.isImportant,
+			timeout: 20000,
+			data: params
+		};
+		return $http(req);
+	};
+
     return {
         getPurchaseItemList: getPurchaseItemList,
 		addPurchaseItem: addPurchaseItem,
 		deletePurchaseItem: deletePurchaseItem,
 		getWishItemList: getWishItemList,
 		addWishItem: addWishItem,
-		deleteWishItem: deleteWishItem
+		deleteWishItem: deleteWishItem,
+		updateWishImportantFlag: updateWishImportantFlag
     };
 });

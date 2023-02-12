@@ -134,4 +134,22 @@ router.post('/api/delete-wish-item', function (req, res) {
     });
 });
 
+router.get('/api/update-wish-item-important-flag', function (req, res) {
+    if(req.query && req.query.id && req.query.isImportant) {
+        MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+            if (err) 
+                res.sendStatus(500);
+                db.db(DB_NAME).collection(WISH_TABLE).updateOne({id: req.query.id}, { $set: {important: req.query.isImportant}}, function(err) {
+                if (err) 
+                    res.sendStatus(500);
+                else
+                    res.sendStatus(200);
+                db.close();
+            });
+        });
+    } else {
+        res.sendStatus(500);
+    }
+});
+
 module.exports = router;

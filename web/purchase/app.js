@@ -61,7 +61,8 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                     {id: "grocery", value: "Grocery"},
                     {id: "vegetable", value: "Vegetable"},
                     {id: "fruit", value: "Fruit"},
-                    {id: "furniture", value: "Furniture"},
+                    {id: "kitchenware", value: "Kitchenware"},
+                    {id: "non-veg", value: "Non-veg"},
                     {id: "others", value: "Others"}
                 ]
             },
@@ -85,7 +86,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.id = 'ITEM_' + moment().format('x');
                 this.title = '';
                 this.desc = '';
-                this.date = moment().format('DD-MM-YY');
+                this.date = moment().format('DD/MM/YYYY');
                 this.type = this.formOptions.itemType.list[0].id;
                 this.quantity = 1;
                 this.unit = this.formOptions.itemUnit.list[0].id;
@@ -210,7 +211,8 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                     id: 'ITEM_' + moment().format('x'),
                     title: this.title,
                     type: this.type,
-                    desc: this.desc
+                    desc: this.desc,
+                    important: 'false'
                 }
                 dbData.addWishItem(params).then(function(){
                     $scope.alertHandler.triggerAlert('New Wish Item added successfully', 5);
@@ -230,7 +232,8 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                     id: this.id,
                     title: this.title,
                     type: this.type,
-                    desc: this.desc
+                    desc: this.desc,
+                    important: 'false'
                 }
                 dbData.deleteWishItem({id: params.id}).then(function(){
                     return dbData.addWishItem(params);
@@ -339,6 +342,10 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
             console.log("Override this method to do something...");
         }
     }
+
+    $scope.formatDate = function(dateStr, dateInputFormat, dateOutputFormat) {
+        return moment(dateStr, dateInputFormat).format(dateOutputFormat);
+    };
 
     //onload calls
     $scope.page.wishlist.search.findWishlistItems();

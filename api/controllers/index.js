@@ -36,7 +36,6 @@ router.post('/api/get-purchase-item', function (req, res) {
                         } else {
                             memo.push({
                                 'title': obj.title,
-                                'desc': obj.desc,
                                 'type': obj.type,
                                 'details': [obj]
                             });

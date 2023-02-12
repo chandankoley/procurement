@@ -84,23 +84,22 @@
       </button>
     </div>
 
-    <span ng-show="page.purchaselist.searchSummary !== ''" class="badge badge-pill badge-dark">{{page.purchaselist.searchSummary}}</span>
+    <span ng-show="page.purchaselist.searchSummary !== ''" class="badge badge-pill badge-light">{{page.purchaselist.searchSummary}}</span>
 
     <div ng-repeat="dataObj in page.purchaselist.data" class="card" style="margin: 1rem;">
       <h4 class="card-title" style="margin: 10px;">
         <span class="material-icons">verified</span>
-        {{dataObj.title}}
-        <span class="material-icons" style="float: right;">bookmark_added</span>
+        <span>{{dataObj.title}}</span>
+        <span style="font-size: 0.8rem; color: #b0aeae;">({{dataObj.type}})</span>
       </h4>
-      <span style="font-size: x-small; margin: 5px;">{{dataObj.desc}}</span>
-      <span class="badge badge-info">{{dataObj.type}}</span>
       <ul class="list-group list-group-flush">
         <li ng-repeat="obj in dataObj.details" class="list-group-item">
-          <span class="badge badge-light">{{obj.date}}</span>
-          <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
-          <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'purchase');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
+          <span>{{formatDate(obj.date, 'DD/MM/YYYY', 'Do MMM YYYY (dddd)')}}</span>
+          <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
+          <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
+          <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
         </li>
       </ul>
     </div>

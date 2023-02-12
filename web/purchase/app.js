@@ -87,7 +87,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.title = '';
                 this.desc = '';
                 this.date = moment().format('DD/MM/YYYY');
-                this.type = this.formOptions.itemType.list[0].id;
+                //this.type = this.formOptions.itemType.list[0].id;  keeping last type as default
                 this.quantity = 1;
                 this.unit = this.formOptions.itemUnit.list[0].id;
                 this.price = 100;

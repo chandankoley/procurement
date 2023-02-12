@@ -114,11 +114,9 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 this.id = itemObj.id;
                 this.title = itemObj.title;
                 this.desc = itemObj.desc;
-                this.date = itemObj.date;
+                this.date = moment().format('DD/MM/YYYY');
                 this.type = itemObj.type;
-                this.quantity = parseFloat(itemObj.quantity);
-                this.unit = itemObj.unit;
-                this.price = parseInt(itemObj.price);
+                this.important = itemObj.important;
                 this.formOptions.isButtonVisible.addNewPurchase = false;
                 this.formOptions.isButtonVisible.addNewWish = false;
                 this.formOptions.isButtonVisible.editPurchase = false;

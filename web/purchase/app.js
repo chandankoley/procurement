@@ -11,9 +11,10 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                     dbData.getWishItemList().then(function(res){
                         $scope.page.wishlist.data = res.data;
                         if($scope.page.wishlist.data.length > 0) {
-                            $scope.page.wishlist.searchSummary = _.map($scope.page.wishlist.data, function(itemObj) {
-                                return itemObj.details.length + ' ' + itemObj.type + (itemObj.details.length > 1 ? 's': '');
-                            }).join(', ') + ' in your Wishlist';
+                            $scope.page.wishlist.searchSummary = 'Found ' + _.reduce($scope.page.wishlist.data, function(memo, itemObj){
+                                memo += itemObj.details.length;
+                                return memo;
+                            }, 0) + ' items in your wishlist.'
                         } else {
                             $scope.page.wishlist.searchSummary = 'Looking like your Wishlist is Empty' ;
                         }

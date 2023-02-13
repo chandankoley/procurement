@@ -61,7 +61,7 @@
       <span class="material-icons">refresh</span> 
       <span style="vertical-align: super;">Refresh</span>
     </button>
-    <span ng-show="page.wishlist.searchSummary !== ''" class="badge badge-pill badge-dark">{{page.wishlist.searchSummary}}</span>
+    <div ng-show="page.wishlist.searchSummary !== ''" class="badge badge-pill badge-light">{{page.wishlist.searchSummary}}</div>
 
     <div ng-repeat="dataObj in page.wishlist.data" class="card" style="margin: 1rem;">
       <h4 class="card-title" style="margin: 10px;">

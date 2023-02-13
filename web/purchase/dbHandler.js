@@ -69,6 +69,15 @@ app.factory('dbData', function ($http) {
 		return $http(req);
 	};
 
+	var getDistinctPurchaseItem = function(){
+		var req = {
+			method: 'GET',
+			url: '/api/get-distinct-purchase-item',
+			timeout: 20000
+		};
+		return $http(req);
+	};
+
     return {
         getPurchaseItemList: getPurchaseItemList,
 		addPurchaseItem: addPurchaseItem,
@@ -76,6 +85,7 @@ app.factory('dbData', function ($http) {
 		getWishItemList: getWishItemList,
 		addWishItem: addWishItem,
 		deleteWishItem: deleteWishItem,
-		updateWishImportantFlag: updateWishImportantFlag
+		updateWishImportantFlag: updateWishImportantFlag,
+		getDistinctPurchaseItem: getDistinctPurchaseItem
     };
 });

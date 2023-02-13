@@ -3,14 +3,20 @@ var app = angular.module('purchaseApp', []);
 app.controller('purchaseController', function ($scope, $timeout, dbData) {
 
     $scope.page = {
-        open: "purchase",
+        open: "wishlist",
         wishlist: {
             search: {
                 findWishlistItems: function() {
                     $scope.page.wishlist.searchSummary = 'Searching your wish. Please wait...';
                     dbData.getWishItemList().then(function(res){
                         $scope.page.wishlist.data = res.data;
-                        $scope.page.wishlist.searchSummary = '' ;
+                        if($scope.page.wishlist.data.length > 0) {
+                            $scope.page.wishlist.searchSummary = _.map($scope.page.wishlist.data, function(itemObj) {
+                                return itemObj.details.length + ' ' + itemObj.type + (itemObj.details.length > 1 ? 's': '');
+                            }).join(', ') + ' in your Wishlist';
+                        } else {
+                            $scope.page.wishlist.searchSummary = 'Looking like your Wishlist is Empty' ;
+                        }
                     }).catch(function(e){
                         console.error(e);
                         $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
@@ -22,7 +28,34 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         },
         purchaselist: {
             search: {
+                timeout: null,
                 titleStr: '',
+                titleTypeaheadList: [],
+                titleTypeaheadSearchedItems: [],
+                updateTypeaheadList: function() {
+                    dbData.getDistinctPurchaseItem().then(function(searchList) {
+                        $scope.page.purchaselist.search.titleTypeaheadList = searchList.data;
+                    }).catch(function(e){
+                        console.error("failed to load typeahead::", e);
+                    });
+                },
+                updatetitleTypeaheadSearchedItems: function() {
+                    var _this = this;
+                    if(_this.titleStr !== '') {
+                        clearTimeout(this.timeout);
+                        this.timeout = setTimeout(function() {
+                            $scope.page.purchaselist.search.titleTypeaheadSearchedItems = _.reduce(_this.titleTypeaheadList, function(memo, item){
+                                if(item.toLowerCase().indexOf(_this.titleStr.toLowerCase()) >= 0 && memo.length <= 10) {
+                                    memo.push(item);
+                                }
+                                return memo;
+                            }, []);
+                            $scope.$apply();
+                        }, 1500);
+                    } else {
+                        _this.titleTypeaheadSearchedItems = [];
+                    }
+                },
                 timeRange: {
                     sdt: moment().subtract(1, 'months').format('YYYY-MM-DD'),
                     edt: moment().format('YYYY-MM-DD'),
@@ -383,4 +416,5 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
     //onload calls
     $scope.page.wishlist.search.findWishlistItems();
     $scope.page.purchaselist.search.findPurchasedItems();
+    $scope.page.purchaselist.search.updateTypeaheadList();
 });

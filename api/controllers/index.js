@@ -162,4 +162,19 @@ router.get('/api/update-wish-item-important-flag', function (req, res) {
     }
 });
 
+router.get('/api/get-distinct-purchase-item', function (req, res) {
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+        db.db(DB_NAME).collection(PURCHASE_TABLE).distinct('title').then(function (distinctDbData) {
+            res.send(distinctDbData);
+            db.close();
+        }).catch(function(e) {
+            console.error('Faild get-distinct-purchase-item ::', e);
+            res.sendStatus(500);
+            db.close();
+        });
+    });
+});
+
 module.exports = router;

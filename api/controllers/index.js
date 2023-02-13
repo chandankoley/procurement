@@ -6,6 +6,7 @@ const fs = require('fs');
 const _ = require('lodash');
 var MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
+const MAX_COLLECTION_SIZE = 100000;
 const DB_NAME = "inventory";
 const PURCHASE_TABLE = "purchase";
 const WISH_TABLE = "wish";
@@ -18,13 +19,23 @@ router.get('/', function (req, res) {
 
 router.post('/api/get-purchase-item', function (req, res) {
     var searchObj = {};
-    if(req.body.titleStr !== '') {
+    if(req.body.titleStr && req.body.titleStr !== '') {
         searchObj['title'] = new RegExp(`${req.body.titleStr}`, "gi");
+    }
+    if(req.body.sdt && req.body.edt) {
+        searchObj = _.extend(searchObj,{
+            "$expr": {
+                "$and": [
+                    {"$gte" : [{"$toInt" :"$date"} , _.parseInt(req.body.sdt)]},
+                    {"$lte" : [{"$toInt" :"$date"} , _.parseInt(req.body.edt)]}
+                ]
+            }
+        });
     }
     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
         if (err) 
             res.sendStatus(500);
-            db.db(DB_NAME).collection(PURCHASE_TABLE).find(searchObj).toArray(function (err, dbData) {
+            db.db(DB_NAME).collection(PURCHASE_TABLE).find(searchObj).limit(MAX_COLLECTION_SIZE).toArray(function (err, dbData) {
                 if (err) {
                     res.sendStatus(500);
                 } else {

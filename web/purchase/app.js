@@ -3,7 +3,7 @@ var app = angular.module('purchaseApp', []);
 app.controller('purchaseController', function ($scope, $timeout, dbData) {
 
     $scope.page = {
-        open: "wishlist",
+        open: "purchase",
         wishlist: {
             search: {
                 findWishlistItems: function() {
@@ -23,9 +23,40 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         purchaselist: {
             search: {
                 titleStr: '',
+                timeRange: {
+                    sdt: moment().subtract(1, 'months').format('YYYY-MM-DD'),
+                    edt: moment().format('YYYY-MM-DD'),
+                    selectedTime: "1-M",
+                    list: [
+                        {id: "1-M", value: "Last 1 Month"},
+                        {id: "15-D", value: "Last 15 Days"},
+                        {id: "7-D", value: "Last 7 Days"},
+                        {id: "TD", value: "Today"},
+                        {id: "2-M", value: "Last 2 Months"},
+                        {id: "3-M", value: "Last Quarter"},
+                        {id: "6-M", value: "Last Half Year"},
+                        {id: "12-M", value: "Last Year"}
+                    ],
+                    onTimeRangeChange: function() {
+                        if (this.selectedTime === 'TD') {
+                            this.sdt = this.edt;
+                        } else {
+                            var td = this.selectedTime.split('-');
+                            if(td[1] === 'D') {
+                                this.sdt = moment().subtract(parseInt(td[0]), 'days').format('YYYY-MM-DD');
+                            } else if(td[1] === 'M') {
+                                this.sdt = moment().subtract(parseInt(td[0]), 'months').format('YYYY-MM-DD');
+                            } else {
+                                this.sdt = moment().subtract(12, 'months').format('YYYY-MM-DD');
+                            }
+                        }
+                    }
+                },
                 findPurchasedItems: function() {
                     var params = {
-                        titleStr: this.titleStr.toLowerCase()
+                        titleStr: this.titleStr.toLowerCase(),
+                        sdt: moment(this.timeRange.sdt, 'YYYY-MM-DD').format('YYYYMMDD'),
+                        edt: moment(this.timeRange.edt, 'YYYY-MM-DD').format('YYYYMMDD')
                     };
                     $scope.page.purchaselist.searchSummary = 'Searching your item. Please wait...';
                     dbData.getPurchaseItemList(params).then(function(res){
@@ -343,6 +374,10 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
 
     $scope.formatDate = function(dateStr, dateInputFormat, dateOutputFormat) {
         return moment(dateStr, dateInputFormat).format(dateOutputFormat);
+    };
+
+    var getDateRange = function() {
+
     };
 
     //onload calls

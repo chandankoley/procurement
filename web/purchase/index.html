@@ -77,6 +77,9 @@
   <div class="purchase" ng-show="page.open === 'purchase'">
 
     <div class="input-group mb-3" style="margin-bottom: 0px !important;">
+      <select class="custom-select" style="height: 40px;" id="typeSelection1" ng-model="page.purchaselist.search.timeRange.selectedTime" ng-change="page.purchaselist.search.timeRange.onTimeRangeChange()">
+        <option ng-repeat="obj in page.purchaselist.search.timeRange.list" value="{{obj.id}}">{{obj.value}}</option>
+      </select>
       <input type="text" ng-model="page.purchaselist.search.titleStr" class="form-control" placeholder="Type item title" aria-label="Item name" aria-describedby="basic-addon2">
       <button type="button" class="btn btn-primary btn-sm" ng-click="page.purchaselist.search.findPurchasedItems()">
         <span class="material-icons">search</span> 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js" integrity="sha512-5881VEuHpuoBcF5dkZjzJPjuD27vB+24oomM0SJ72Azk3rToGdFeghdmdJOVduqjLyLvhQ811k9vEbxdUy5IuQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<body>
+
+<div ng-app="myapp" ng-controller="myctrl">
+
+<canvas class="chart chart-line" chart-data="data" chart-labels="labels" 
+	chart-series="series" chart-click="onClick"></canvas> 
+
+</div>
+
+<script>
+angular.module("myapp", ["chart.js"])
+  // Optional configuration
+  .config(['ChartJsProvider', function (ChartJsProvider) {
+    // Configure all charts
+    ChartJsProvider.setOptions({
+      chartColors: ['#3c69e7', '#d1593a', '#e3b466'],
+      responsive: true
+    });
+    // Configure all line charts
+    ChartJsProvider.setOptions('line', {
+      showLines: true
+    });
+  }])
+  .controller("myctrl", ['$scope', function ($scope) {
+
+  $scope.labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  $scope.series = ["2022", "2023", "2024"];
+  $scope.data = [
+    [2365, 5925, 8025, 8189, 5674, 5547, 4000, 2365, 5925, 8025, 8189, 5674],
+    [2865, 4878, 4078, 1956, 8658, 2736, 9077, 2865, 4878, 4078, 1956, 8658],
+    [3465, 5445, 8445, 8459, 2374, 5567, 4450, 2555, 5955, 8035, 2389, 5474]
+  ];
+  $scope.onClick = function (points, evt) {
+    console.log(points, evt);
+  };
+  
+}]);
+</script>
+
+</body>
+</html>

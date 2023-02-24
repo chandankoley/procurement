@@ -9,12 +9,124 @@ require('dotenv').config()
 const MAX_COLLECTION_SIZE = 100000;
 const DB_NAME = "inventory";
 const PURCHASE_TABLE = "purchase";
+const LOGIN_TABLE = "login";
 const WISH_TABLE = "wish";
+var mailer = require("../models/mailer");
+
+var otpValidationCount = {};
 
 router.use('/public',express.static(path.join(__dirname, '../../web')));
 
+router.get('/login', function (req, res) {
+    res.send(fs.readFileSync(path.join(__dirname, '../../web/login/index.html'), 'ascii'));
+});
+
+router.post('/api/send-otp', function (req, res) {
+    if(req.body.user_id) {
+        otpValidationCount[encodeURIComponent(req.body.user_id)] = 10;
+        MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+            if (err) 
+                res.sendStatus(500);
+            db.db(DB_NAME).collection(LOGIN_TABLE).find({user_id: encodeURIComponent(req.body.user_id)}).limit(1).toArray(function (err, dbData) {
+                if (err) {
+                    res.sendStatus(500);
+                } else if (dbData[0]) {
+                    var otp = _.random(111111, 999999).toString();
+                    mailer.sendMail({
+                        to: dbData[0].email,
+                        subject: "SmartBuy OTP Notification",
+                        body: "<p>To login into your account, use OTP - <b>" + otp + "</b>. Never share your OTP to anyone. SmaryBuy never ask OTP in call.</p>"
+                    });
+                    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+                        if (err) 
+                            res.sendStatus(500);
+                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {otp: otp}}, function(err) {
+                            if (err) 
+                                res.sendStatus(500);
+                            else
+                                res.send("OTP has been shared to your email");
+                            db.close();
+                        });
+                    });
+                } else {
+                    res.send("User ID not found");
+                }
+                db.close();
+            });
+        });
+    } else {
+        res.send("Invalid User ID");
+    }
+});
+
+router.post('/api/verify-otp', function (req, res) {
+    if(req.body.user_id && req.body.otp && otpValidationCount[encodeURIComponent(req.body.user_id)] > 0) {
+        otpValidationCount[encodeURIComponent(req.body.user_id)]--;
+        console.log("otpValidationCount::", JSON.stringify(otpValidationCount));
+        MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+            if (err) 
+                res.sendStatus(500);
+            db.db(DB_NAME).collection(LOGIN_TABLE).find({user_id: encodeURIComponent(req.body.user_id)}).limit(1).toArray(function (err, dbData) {
+                if (err) {
+                    res.sendStatus(500);
+                } else if (dbData[0] && dbData[0].otp === encodeURIComponent(req.body.otp)) {
+                    var passcode = _.random(11111, 99999) + "-" + _.random(11111, 99999) + "-" + _.random(11111, 99999) + "-" + _.random(11111, 99999);
+                    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+                        if (err) 
+                            res.sendStatus(500);
+                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {'passcode': passcode, 'session_time': moment().add(1, 'days').format("YYYYMMDDHHmmss")}}, function(err) {
+                            if (err) 
+                                res.sendStatus(500);
+                            else
+                                res.send({"passcode": passcode});
+                            db.close();
+                        });
+                    });
+                } else {
+                    res.sendStatus(401);
+                }
+                db.close();
+            });
+        });
+    } else {
+        res.sendStatus(401);;
+    }
+});
+
 router.get('/', function (req, res) {
     res.send(fs.readFileSync(path.join(__dirname, '../../web/purchase/index.html'), 'ascii'));
+});
+
+router.get('/chart', function (req, res) {
+    res.send(fs.readFileSync(path.join(__dirname, '../../web/chart/index.html'), 'ascii'));
+});
+
+router.use(function (req, res, next) {
+    console.log('Login verification here::' + req.headers["auth-info"]);
+    var passcode = encodeURIComponent(req.headers["auth-info"]);
+    MongoClient.connect(process.env.MONGO_URL, function(err, db) {
+        if (err) 
+            res.sendStatus(500);
+        db.db(DB_NAME).collection(LOGIN_TABLE).find({passcode: passcode}).limit(1).toArray(function (err, dbData) {
+            if (err) {
+                res.sendStatus(500);
+            } else if (dbData[0] && moment(dbData[0].session_time,'YYYYMMDDHHmmss').isAfter()) {
+                req['uInfo'] = {
+                    user_id: dbData[0].user_id,
+                    email: dbData[0].email,
+                    name: dbData[0].name
+                };
+                next();
+            } else {
+                res.sendStatus(401);
+            }
+            db.close();
+        });
+    });
+});
+
+router.get('/api/is-valid-session', function (req, res) {
+    res.send(req.uInfo);
 });
 
 router.post('/api/get-purchase-item', function (req, res) {

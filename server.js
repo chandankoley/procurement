@@ -13,11 +13,6 @@ app.use('/status', function (req, res) {
     });
 });
 
-app.use(function (req, res, next) {
-    console.log('Login verification here...');
-    next();
-});
-
 app.use('/', require('./api/controllers/index.js'));
 
 var server = app.listen(PORT_NO, function () {

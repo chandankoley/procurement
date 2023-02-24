@@ -1,6 +1,6 @@
 var app = angular.module('purchaseApp', []);
 
-app.controller('purchaseController', function ($scope, $timeout, dbData) {
+app.controller('purchaseController', function ($scope, $timeout, $window, dbData) {
 
     $scope.page = {
         open: "wishlist",
@@ -20,7 +20,9 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                         }
                     }).catch(function(e){
                         console.error(e);
+                        $scope.page.wishlist.searchSummary = '';
                         $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
+                        $scope.validateSession('api-error', e);
                     });
                 }
             },
@@ -38,6 +40,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                         $scope.page.purchaselist.search.titleTypeaheadList = searchList.data;
                     }).catch(function(e){
                         console.error("failed to load typeahead::", e);
+                        $scope.validateSession('api-error', e);
                     });
                 },
                 updatetitleTypeaheadSearchedItems: function() {
@@ -98,7 +101,9 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                         $scope.page.purchaselist.searchSummary = 'Found ' + res.data.length + ' items according to your search filter' ;
                     }).catch(function(e){
                         console.error(e);
+                        $scope.page.purchaselist.searchSummary = '';
                         $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
+                        $scope.validateSession('api-error', e);
                     });
                 }
             },
@@ -236,6 +241,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to add::", e);
                     $scope.alertHandler.triggerAlert('Failed to add purchased Item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -262,6 +268,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to update::", e);
                     $scope.alertHandler.triggerAlert('Failed to update purchased item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -283,6 +290,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to add::", e);
                     $scope.alertHandler.triggerAlert('Failed to add wish item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -306,6 +314,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to update::", e);
                     $scope.alertHandler.triggerAlert('Failed to update wish item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -333,6 +342,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to update::", e);
                     $scope.alertHandler.triggerAlert('Failed to Remove Item from wishlist and add to Purchased Item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             } else {
                 $scope.alertHandler.triggerAlert(validCheck.reason, 5);
@@ -353,6 +363,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to delete::", e);
                     $scope.alertHandler.triggerAlert('Failed to delete purchased item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             }
         } else if(target === 'wish'){
@@ -368,6 +379,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
                 }).catch(function(e){
                     console.error("Item failed to delete::", e);
                     $scope.alertHandler.triggerAlert('Failed to delete wish item', 5);
+                    $scope.validateSession('api-error', e);
                 });
             }
         } else {
@@ -382,6 +394,7 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         }).catch(function(e){
             console.error("Item failed to delete::", e);
             $scope.alertHandler.triggerAlert('Failed to update importance of wish item', 5);
+            $scope.validateSession('api-error', e);
         });
     };
 
@@ -410,12 +423,29 @@ app.controller('purchaseController', function ($scope, $timeout, dbData) {
         return moment(dateStr, dateInputFormat).format(dateOutputFormat);
     };
 
-    var getDateRange = function() {
-
+    $scope.validateSession = function(target, error) {
+        if(target === 'app-load') {
+            dbData.isValidSession().then(function() {
+                $scope.page.wishlist.search.findWishlistItems();
+                $scope.page.purchaselist.search.findPurchasedItems();
+                $scope.page.purchaselist.search.updateTypeaheadList();
+            }).catch(function(e){
+                if(e.status === 401) {
+                    $window.open("/login", "_parent");
+                } else {
+                    $scope.alertHandler.triggerAlert('Internal server error', 5);
+                }
+            });
+        } else if(target === 'api-error') {
+            if(error.status === 401) {
+                $window.open("/login", "_parent");
+            }
+        } else {
+            console.log("Invalid argument passed in validate session");
+        }
     };
-
+    
     //onload calls
-    $scope.page.wishlist.search.findWishlistItems();
-    $scope.page.purchaselist.search.findPurchasedItems();
-    $scope.page.purchaselist.search.updateTypeaheadList();
+    $scope.validateSession('app-load');
+    
 });

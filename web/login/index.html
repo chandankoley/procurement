@@ -13,13 +13,17 @@
   </head>
 <body>
 <div ng-app="login" ng-controller="loginctrl">
-<div>
+<div style="margin: 10px;">
 
   <div ng-if="!!userInfo.name">
     <h3 class="display-4">Hi, {{userInfo.name}}</h3>
     <div style="font-family: inherit; font-size: 1.3rem; margin-bottom: 10px;">
       <b>User ID:</b> {{userInfo.user_id}} | <b>Email:</b> {{userInfo.email}}</div>
-    <button type="button" class="btn btn-primary btn-sm" ng-click="removeLocalKey();">
+    <button type="button" class="btn btn-primary btn-sm" ng-click="openHomePage();">
+      <span class="material-icons">home</span>
+      <span style="vertical-align: super;">Home</span>
+    </button>
+    <button type="button" class="btn btn-warning btn-sm" ng-click="removeLocalKey();">
       <span class="material-icons">logout</span>
       <span style="vertical-align: super;">Logout</span>
     </button>
@@ -97,6 +101,10 @@ angular.module("login", []).controller("loginctrl", function ($scope, $http, $wi
   $scope.removeLocalKey = function() {
     localStorage.removeItem('smartbuy');
     $window.open("/login", "_parent");
+  };
+
+  $scope.openHomePage = function() {
+    $window.open("/", "_parent");
   };
   
   var getUserInfo = function() {

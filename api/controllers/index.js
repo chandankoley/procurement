@@ -11,6 +11,9 @@ const DB_NAME = "inventory";
 const PURCHASE_TABLE = "purchase";
 const LOGIN_TABLE = "login";
 const WISH_TABLE = "wish";
+const MAX_OTP_TRY_COUNT = 3;
+const SESSION_TIME_FORMAT = "YYYYMMDDHHmmss";
+
 var mailer = require("../models/mailer");
 
 var otpValidationCount = {};
@@ -23,7 +26,7 @@ router.get('/login', function (req, res) {
 
 router.post('/api/send-otp', function (req, res) {
     if(req.body.user_id) {
-        otpValidationCount[encodeURIComponent(req.body.user_id)] = 10;
+        otpValidationCount[encodeURIComponent(req.body.user_id)] = MAX_OTP_TRY_COUNT;
         MongoClient.connect(process.env.MONGO_URL, function(err, db) {
             if (err) 
                 res.sendStatus(500);
@@ -74,7 +77,7 @@ router.post('/api/verify-otp', function (req, res) {
                     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
                         if (err) 
                             res.sendStatus(500);
-                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {'passcode': passcode, 'session_time': moment().add(1, 'days').format("YYYYMMDDHHmmss")}}, function(err) {
+                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {'passcode': passcode, 'session_time': moment().add(1, 'days').format(SESSION_TIME_FORMAT)}}, function(err) {
                             if (err) 
                                 res.sendStatus(500);
                             else
@@ -102,7 +105,6 @@ router.get('/chart', function (req, res) {
 });
 
 router.use(function (req, res, next) {
-    console.log('Login verification here::' + req.headers["auth-info"]);
     var passcode = encodeURIComponent(req.headers["auth-info"]);
     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
         if (err) 
@@ -110,7 +112,7 @@ router.use(function (req, res, next) {
         db.db(DB_NAME).collection(LOGIN_TABLE).find({passcode: passcode}).limit(1).toArray(function (err, dbData) {
             if (err) {
                 res.sendStatus(500);
-            } else if (dbData[0] && moment(dbData[0].session_time,'YYYYMMDDHHmmss').isAfter()) {
+            } else if (dbData[0] && moment(dbData[0].session_time, SESSION_TIME_FORMAT).isAfter()) {
                 req['uInfo'] = {
                     user_id: dbData[0].user_id,
                     email: dbData[0].email,

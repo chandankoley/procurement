@@ -112,6 +112,8 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
         }
     };
 
+    $scope.userInfo = {};
+
     $scope.getUnitPrice = function (unit, quantity, price) {
         return (price/quantity).toFixed(2) + "/" + unit;
     };
@@ -425,7 +427,9 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
 
     $scope.validateSession = function(target, error) {
         if(target === 'app-load') {
-            dbData.isValidSession().then(function() {
+            dbData.isValidSession().then(function(res) {
+                $scope.userInfo = res.data;
+                $scope.userInfo['first_name'] = _.chain($scope.userInfo.name).split(" ").head().value();
                 $scope.page.wishlist.search.findWishlistItems();
                 $scope.page.purchaselist.search.findPurchasedItems();
                 $scope.page.purchaselist.search.updateTypeaheadList();
@@ -443,6 +447,10 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
         } else {
             console.log("Invalid argument passed in validate session");
         }
+    };
+
+    $scope.goToProfile = function() {
+        $window.open("/login", "_parent");
     };
     
     //onload calls

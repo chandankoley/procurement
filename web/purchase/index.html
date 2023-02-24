@@ -31,7 +31,7 @@
     
 <div>  
 
-  <nav class="navbar navbar-light bg-light">
+  <nav style="margin-bottom: 10px; box-shadow: 5px 0px 5px 0px #888888;" class="navbar navbar-light bg-light">
     <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="material-icons">view_list</span>
@@ -47,6 +47,11 @@
           <span style="vertical-align: super;">Purchase Details</span>
         </a>
       </div>
+    </div>
+
+    <div style="border: 1px solid lightgray; padding: 5px; cursor: pointer;" ng-click="goToProfile()">
+      <span class="material-icons">account_circle</span>
+      <span style="vertical-align: super; font-size: 0.9rem;">{{userInfo.first_name}}</span>
     </div>
 
     <!-- Button trigger modal -->

@@ -1,30 +1,39 @@
 app.factory('dbData', function ($http) {
 
-    var getPurchaseItemList = function(params){
+    var getPurchaseItemList = function(params) {
 		var req = {
 			method: 'POST',
 			url: '/api/get-purchase-item',
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
 	};
 
-	var addPurchaseItem = function(params){
+	var addPurchaseItem = function(params) {
 		var req = {
 			method: 'POST',
 			url: '/api/add-purchase-item',
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
 	};
 
-	var deletePurchaseItem = function(params){
+	var deletePurchaseItem = function(params) {
 		var req = {
 			method: 'POST',
 			url: '/api/delete-purchase-item',
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
@@ -34,7 +43,10 @@ app.factory('dbData', function ($http) {
 		var req = {
 			method: 'GET',
 			url: '/api/get-wish-item',
-			timeout: 20000
+			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 		};
 		return $http(req);
 	};
@@ -44,6 +56,9 @@ app.factory('dbData', function ($http) {
 			method: 'POST',
 			url: '/api/add-wish-item',
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
@@ -54,6 +69,9 @@ app.factory('dbData', function ($http) {
 			method: 'POST',
 			url: '/api/delete-wish-item',
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
@@ -64,6 +82,9 @@ app.factory('dbData', function ($http) {
 			method: 'GET',
 			url: '/api/update-wish-item-important-flag?id=' + params.id + '&isImportant=' + params.isImportant,
 			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 			data: params
 		};
 		return $http(req);
@@ -73,7 +94,22 @@ app.factory('dbData', function ($http) {
 		var req = {
 			method: 'GET',
 			url: '/api/get-distinct-purchase-item',
-			timeout: 20000
+			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
+		};
+		return $http(req);
+	};
+
+	var isValidSession = function(){
+		var req = {
+			method: 'GET',
+			url: '/api/is-valid-session',
+			timeout: 20000,
+			headers: {
+				"auth-info": localStorage.getItem('smartbuy')
+			},
 		};
 		return $http(req);
 	};
@@ -86,6 +122,7 @@ app.factory('dbData', function ($http) {
 		addWishItem: addWishItem,
 		deleteWishItem: deleteWishItem,
 		updateWishImportantFlag: updateWishImportantFlag,
-		getDistinctPurchaseItem: getDistinctPurchaseItem
+		getDistinctPurchaseItem: getDistinctPurchaseItem,
+		isValidSession: isValidSession
     };
 });

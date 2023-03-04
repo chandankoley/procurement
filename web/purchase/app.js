@@ -2,6 +2,8 @@ var app = angular.module('purchaseApp', []);
 
 app.controller('purchaseController', function ($scope, $timeout, $window, dbData) {
 
+    var date = new Date();
+    $scope.userInfo = {};
     $scope.page = {
         open: "wishlist",
         wishlist: {
@@ -55,9 +57,9 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                                 return memo;
                             }, []);
                             $scope.$apply();
-                        }, 1500);
+                        }, 500);
                     } else {
-                        _this.titleTypeaheadSearchedItems = [];
+                        $scope.page.purchaselist.search.titleTypeaheadSearchedItems = [];
                     }
                 },
                 timeRange: {
@@ -109,13 +111,69 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
             },
             searchSummary: '',
             data: []
+        },
+        report: {
+            search: {
+                endDate: new Date(),
+                startDate: new Date(date.setDate(date.getDate() - 7)),
+                groupOption: {
+                    selected: 'date',
+                    list: [
+                        {id: "date", value: "Group by Date"},
+                        {id: "type", value: "Group by Type"},
+                        {id: "title", value: "Group by Product"}
+                    ]
+                },
+                findPurchasedItems: function() {
+                    var _this = this;
+                    var params = {
+                        sdt: moment(_this.startDate).format('YYYYMMDD'),
+                        edt: moment(_this.endDate).format('YYYYMMDD')
+                    };
+                    $scope.page.report.data.searchSummary = "Generating your report, Please wait...";
+                    dbData.getPurchaseItemList(params).then(function(res){
+                        $scope.page.report.data.searchSummary = "Found " + res.data.length + " items according to your search";
+                        $scope.page.report.data.searchInfo.query = "Expense details of " +  moment(_this.startDate).format('DD MMM\'YY') + " to " + moment(_this.endDate).format('DD MMM\'YY');
+                        $scope.page.report.data.searchInfo.data = res.data;
+                        _this.formatReport();
+                    }).catch(function(e){
+                        console.error(e);
+                        $scope.page.report.data.searchSummary = "Failed to Generate your report";
+                        $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
+                        $scope.validateSession('api-error', e);
+                    });
+                },
+                formatReport: function() {
+                    $scope.page.report.data.tableInfo = _.chain($scope.page.report.data.searchInfo.data).reduce(function(memo, item){
+                        memo = memo.concat(item.details);
+                        return memo;
+                    }, []).groupBy(this.groupOption.selected).reduce(function(memo, list, key){
+                        var obj = {
+                            group: key,
+                            total: _.chain(list).pluck('price').sum().value(),
+                            items: list
+                        };
+                        memo.total += obj.total;
+                        memo.list.push(obj);
+                        return memo;
+                    }, {query: $scope.page.report.data.searchInfo.query, total: 0, list: []}).value();
+                    console.log("report::", $scope.page.report.data.tableInfo);
+                }
+            },
+            data: {
+                searchSummary: '',
+                searchInfo: {
+                    query: "",
+                    data: []
+                },
+                tableInfo: {}
+            },
+            toggleVisibility: function(groupIndex, itemIndex) {
+                console.log("item details::", $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex]);
+                var visibility = $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex].visible;
+                $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex].visible = visibility ? !visibility : true;
+            }
         }
-    };
-
-    $scope.userInfo = {};
-
-    $scope.getUnitPrice = function (unit, quantity, price) {
-        return (price/quantity).toFixed(2) + "/" + unit;
     };
 
     $scope.newItemDialog = {
@@ -135,6 +193,8 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     {id: "fruit", value: "Fruit"},
                     {id: "kitchenware", value: "Kitchenware"},
                     {id: "non-veg", value: "Non-veg"},
+                    {id: "automobile", value: "Automobile"},
+                    {id: "Entertainment", value: "Entertainment"},
                     {id: "others", value: "Others"}
                 ]
             },
@@ -142,7 +202,8 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 list: [
                     {id: "pc", value: "Piece"},
                     {id: "kg", value: "Kg"},
-                    {id: "litre", value: "Litre"}
+                    {id: "litre", value: "Litre"},
+                    {id: "NA", value: "NA"}
                 ]
             },
             isButtonVisible: {
@@ -424,6 +485,17 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
     $scope.formatDate = function(dateStr, dateInputFormat, dateOutputFormat) {
         return moment(dateStr, dateInputFormat).format(dateOutputFormat);
     };
+
+    $scope.getUnitPrice = function (unit, quantity, price) {
+        return $scope.toIndianCurrency(price/quantity) + "/" + unit;
+    };
+
+    $scope.toIndianCurrency = function(num) {
+        return num.toLocaleString('en-IN', {
+           style: 'currency',
+           currency: 'INR'
+        });
+     };
 
     $scope.validateSession = function(target, error) {
         if(target === 'app-load') {

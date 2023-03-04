@@ -3,6 +3,7 @@
     <title>Inventory Manager</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -16,6 +17,9 @@
     
 </head>
 <style>
+  body {
+    font-family: "Montserrat", sans-serif;
+  }
   .search-typeahead {
     position: absolute;
     border: 1px solid lightgray;
@@ -45,6 +49,10 @@
         <a class="dropdown-item" ng-click="page.open = 'purchase'">
           <span class="material-icons">receipt</span>
           <span style="vertical-align: super;">Purchase Details</span>
+        </a>
+        <a class="dropdown-item" ng-click="page.open = 'report'">
+          <span class="material-icons">analytics</span>
+          <span style="vertical-align: super;">Expense Analysis</span>
         </a>
       </div>
     </div>
@@ -127,7 +135,7 @@
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'purchase');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-purchase');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
           <span>{{formatDate(obj.date, 'DD/MM/YYYY', 'Do MMM YYYY (dddd)')}}</span>
-          <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = Rs.{{obj.price}}</span>
+          <span class="badge badge-success">{{obj.quantity}}{{obj.unit}} = {{toIndianCurrency(obj.price)}}</span>
           <span class="badge badge-warning">{{getUnitPrice(obj.unit, obj.quantity, obj.price)}}</span>
           <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
         </li>
@@ -136,10 +144,52 @@
 
   </div>
 
+  <div class="report" ng-show="page.open === 'report'">
+    <div style="margin: 5px;">
+      <input type="date" id="startDate" ng-model="page.report.search.startDate" style="width: 100%; margin-bottom: 5px;">
+      <input type="date" id="endDate" ng-model="page.report.search.endDate" style="width: 100%; margin-bottom: 5px;">
+      <button type="button" class="btn btn-success btn-sm" ng-click="page.report.search.findPurchasedItems()" style="width: 100%;">
+        <span class="material-icons">search</span> 
+        <span style="vertical-align: super;">Find Purchased Items</span>
+      </button>
+    </div>
+    <div class="badge badge-pill badge-light">{{page.report.data.searchSummary}}</div>
+    <div ng-if="page.report.data.tableInfo.list" style="margin: 5px; padding: 5px; border: 1px solid lightgray;">
+      <select class="custom-select" id="typeSelection1" ng-model="page.report.search.groupOption.selected" ng-change="page.report.search.formatReport()" style="margin-bottom: 5px;">
+        <option ng-repeat="obj in page.report.search.groupOption.list" value="{{obj.id}}">{{obj.value}}</option>
+      </select>
+
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" style="background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%);">
+          <span>{{page.report.data.tableInfo.query}}</span>
+          <span class="badge badge-primary badge-pill">Gross Total {{toIndianCurrency(page.report.data.tableInfo.total)}}</span>
+        </li>
+        <div class="list-group" ng-repeat="(groupIndex, groupObj) in page.report.data.tableInfo.list">
+          <a class="list-group-item list-group-item-action flex-column align-items-start" style="background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{groupObj.group}}</h5>
+              <small>Group Total {{toIndianCurrency(groupObj.total)}}</small>
+            </div>
+          </a>
+          <a class="list-group-item list-group-item-action flex-column align-items-start" ng-repeat="(itemIndex, itemObj) in groupObj.items" ng-click="page.report.toggleVisibility(groupIndex, itemIndex);">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{itemObj.title}}</h5>
+              <small>{{toIndianCurrency(itemObj.price)}}</small>
+            </div>
+            <p class="mb-1">{{itemObj.quantity}}{{itemObj.unit}}</p>
+            <div ng-show="itemObj.visible">
+              <span class="badge badge-success badge-pill">{{formatDate(itemObj.date, 'DD/MM/YYYY', 'Do MMM YYYY (dddd)')}}</span>
+              <span class="badge badge-info badge-pill">{{itemObj.type}}</span>
+              <div><small>{{itemObj.desc}}</small></div>
+            </div>
+          </a>
+        </div>
+      </ul>
+    </div>
+  </div>
 
 
-
-<!-- Modal -->
+<!--Purchase/Wish Modal -->
 <div class="modal fade" id="shoppingItem" tabindex="-1" role="dialog" aria-labelledby="shoppingItemTitle" aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered" role="document">
   <div class="modal-content">

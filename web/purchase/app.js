@@ -144,17 +144,20 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     });
                 },
                 formatReport: function() {
+                    var _this = this;
                     $scope.page.report.data.tableInfo = _.chain($scope.page.report.data.searchInfo.data).reduce(function(memo, item){
                         memo = memo.concat(item.details);
                         return memo;
-                    }, []).groupBy(this.groupOption.selected).reduce(function(memo, list, key){
+                    }, []).groupBy(_this.groupOption.selected).reduce(function(memo, list, key){
                         var obj = {
-                            group: key,
+                            group: _this.groupOption.selected === 'type' ? key.charAt(0).toUpperCase() + key.slice(1) : key,
+                            groupSortId: _this.groupOption.selected === 'date' ? moment(key, 'DD-MM-YYYY').format('YYYYMMDD') : key,
                             total: _.chain(list).pluck('price').sum().value(),
                             items: list
                         };
                         memo.total += obj.total;
                         memo.list.push(obj);
+                        memo.list = _.sortBy(memo.list, 'groupSortId');
                         return memo;
                     }, {query: $scope.page.report.data.searchInfo.query, total: 0, list: []}).value();
                     console.log("report::", $scope.page.report.data.tableInfo);
@@ -194,7 +197,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     {id: "kitchenware", value: "Kitchenware"},
                     {id: "non-veg", value: "Non-veg"},
                     {id: "automobile", value: "Automobile"},
-                    {id: "Entertainment", value: "Entertainment"},
+                    {id: "entertainment", value: "Entertainment"},
                     {id: "others", value: "Others"}
                 ]
             },
@@ -495,7 +498,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
            style: 'currency',
            currency: 'INR'
         });
-     };
+    };
 
     $scope.validateSession = function(target, error) {
         if(target === 'app-load') {

@@ -95,10 +95,8 @@
         <li ng-show="page.wishlist.dataTypeVisibilityMap[dataObj.type]" ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
-          <div ng-click="onItemImportant(obj)">
-            <span ng-show="obj.important === 'true'" class="material-icons">task_alt</span>
-            <span style="vertical-align: super;">{{obj.title}}</span>
-          </div>
+          <span ng-show="obj.important === 'true'" class="material-icons">task_alt</span>
+          <span ng-click="onWishItemClickHandler.singleClick(obj)" ng-dblclick="onWishItemClickHandler.doubleClick(obj.title);" style="vertical-align: super;">{{obj.title}}</span>
           <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
         </li>
       </ul>
@@ -276,7 +274,7 @@
   <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.onConfirm()">done</span>
 </div>
 
-<p style="font-size: 0.75rem; margin: 20px 0px 5px 5px; color: #979797;">&#169;2023 : Chandan Koley, LSE Factset Researc Systems, under &#174;Ghar Kharach Applications&#8482;</p>
+<p style="font-size: 0.6rem; margin: 0px auto; color: #979797; width: fit-content;">&#169;2023 : Chandan Koley, LSE Factset Researc Systems, under &#174;Ghar Kharach Applications&#8482;</p>
 
 </div>
 

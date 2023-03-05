@@ -134,7 +134,7 @@ router.get('/api/is-valid-session', function (req, res) {
 router.post('/api/get-purchase-item', function (req, res) {
     var searchObj = {};
     if(req.body.titleStr && req.body.titleStr !== '') {
-        searchObj['title'] = new RegExp(`${req.body.titleStr}`, "gi");
+        searchObj['title'] = req.body.titleStrStrict ? new RegExp(`^${req.body.titleStr}$`, "i") : new RegExp(`${req.body.titleStr}`, "gi");
     }
     if(req.body.sdt && req.body.edt) {
         searchObj = _.extend(searchObj,{

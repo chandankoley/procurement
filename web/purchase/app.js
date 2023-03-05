@@ -98,9 +98,10 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                         }
                     }
                 },
-                findPurchasedItems: function() {
+                findPurchasedItems: function(filter) {
                     var params = {
                         titleStr: this.titleStr.toLowerCase(),
+                        titleStrStrict: filter && filter.titleStrStrict === true,
                         sdt: moment(this.timeRange.sdt, 'YYYY-MM-DD').format('YYYYMMDD'),
                         edt: moment(this.timeRange.edt, 'YYYY-MM-DD').format('YYYYMMDD')
                     };
@@ -464,15 +465,35 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
         }
     };
 
-    $scope.onItemImportant = function(itemObj) {
-        var isImportant = itemObj.important && itemObj.important === 'true' ? 'false' : 'true'
-        dbData.updateWishImportantFlag({id: itemObj.id, isImportant: isImportant}).then(function(){
-            $scope.page.wishlist.search.findWishlistItems();
-        }).catch(function(e){
-            console.error("Item failed to delete::", e);
-            $scope.alertHandler.triggerAlert('Failed to update importance of wish item', 5);
-            $scope.validateSession('api-error', e);
-        });
+    $scope.onWishItemClickHandler = {
+        processFlag: true,
+        silentSingleClick: function() {
+            $scope.onWishItemClickHandler.processFlag = false;
+            $timeout(function() {
+                $scope.onWishItemClickHandler.processFlag = true;
+            }, 1000);
+        },
+        singleClick: function(itemObj) {
+            $timeout(function() {
+                if($scope.onWishItemClickHandler.processFlag === true) {
+                    var isImportant = itemObj.important && itemObj.important === 'true' ? 'false' : 'true'
+                    dbData.updateWishImportantFlag({id: itemObj.id, isImportant: isImportant}).then(function(){
+                        $scope.page.wishlist.search.findWishlistItems();
+                    }).catch(function(e){
+                        console.error("Item failed to delete::", e);
+                        $scope.alertHandler.triggerAlert('Failed to update importance of wish item', 5);
+                        $scope.validateSession('api-error', e);
+                    });
+                }
+            }, 500);
+        },
+        doubleClick: function(title) {
+            $scope.onWishItemClickHandler.silentSingleClick();
+            $scope.page.purchaselist.search.titleStr = title;
+            $scope.page.purchaselist.search.timeRange.selectedTime = "3-M";
+            $scope.page.open = "purchase";
+            $scope.page.purchaselist.search.findPurchasedItems({titleStrStrict: true});
+        }
     };
 
     $scope.alertHandler = {

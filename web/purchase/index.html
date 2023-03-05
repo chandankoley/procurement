@@ -84,15 +84,15 @@
     </button>
     <div ng-show="page.wishlist.searchSummary !== ''" class="badge badge-pill badge-light">{{page.wishlist.searchSummary}}</div>
 
-    <div ng-repeat="(dataIndex, dataObj) in page.wishlist.data" class="card" style="margin: 1rem;">
-      <h4 class="card-title" style="margin: 10px;" ng-click="page.wishlist.toggleVisibility({dataIndex, 'type': 'type-1'})">
+    <div ng-repeat="dataObj in page.wishlist.data" class="card" style="margin: 1rem;">
+      <h4 class="card-title" style="margin: 10px;" ng-click="page.wishlist.toggleVisibility({'key' : dataObj.type, 'type': 'type-1'})">
         <span class="material-icons">verified</span>
         <span>{{dataObj.type}}</span>
-        <span ng-show="!dataObj.visible" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">chevron_left</span>
-        <span ng-show="dataObj.visible" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">expand_more</span>
+        <span ng-show="!page.wishlist.dataTypeVisibilityMap[dataObj.type]" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">chevron_left</span>
+        <span ng-show="page.wishlist.dataTypeVisibilityMap[dataObj.type]" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">expand_more</span>
       </h4>
       <ul class="list-group list-group-flush">
-        <li ng-show="dataObj.visible" ng-repeat="obj in dataObj.details" class="list-group-item">
+        <li ng-show="page.wishlist.dataTypeVisibilityMap[dataObj.type]" ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
           <div ng-click="onItemImportant(obj)">

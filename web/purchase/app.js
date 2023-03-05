@@ -30,10 +30,11 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
             },
             searchSummary: '',
             data: [],
+            dataTypeVisibilityMap: {},
             toggleVisibility: function(info) {
                 if(info.type === 'type-1') {
-                    var visibility = $scope.page.wishlist.data[info.dataIndex].visible;
-                    $scope.page.wishlist.data[info.dataIndex].visible = visibility ? !visibility : true;
+                    var visibility = $scope.page.wishlist.dataTypeVisibilityMap[info.key];
+                    $scope.page.wishlist.dataTypeVisibilityMap[info.key] = visibility ? !visibility : true;
                 }
             }
         },

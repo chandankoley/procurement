@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <head>
-    <title>Inventory Manager</title>
+    <title>Ghar Kharach</title>
+    <!--<link rel = "icon" href="https://thumbs.dreamstime.com/b/indian-rupee-icon-sign-vector-162377406.jpg" type = "image/x-icon">-->
+    <link rel = "icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRy8-c-hsI8999xIB2rtp99umKagfQ5p7VQUEvzQHxtWbyRGxAcQg7P1pZ_1vHc_3sLZM&usqp=CAU" type = "image/x-icon">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
@@ -17,7 +19,7 @@
     
 </head>
 <style>
-  body {
+  .app-body {
     font-family: "Montserrat", sans-serif;
     max-width: 800px;
     margin: 0px auto;
@@ -33,10 +35,13 @@
     box-shadow: 0px 5px 8px #cdcdcd;
     border-radius: 0px 0px 10px 10px;
   }
+  .list-group-item {
+    padding: 0.25rem 0.25rem !important;
+  }
 </style>
 <body ng-app="purchaseApp" ng-controller="purchaseController">
     
-<div>  
+<div class="app-body">  
 
   <nav style="margin-bottom: 10px; box-shadow: 0px 0px 10px 0px #888888" class="navbar navbar-light bg-light">
     <div class="dropdown">
@@ -79,13 +84,15 @@
     </button>
     <div ng-show="page.wishlist.searchSummary !== ''" class="badge badge-pill badge-light">{{page.wishlist.searchSummary}}</div>
 
-    <div ng-repeat="dataObj in page.wishlist.data" class="card" style="margin: 1rem;">
-      <h4 class="card-title" style="margin: 10px;">
+    <div ng-repeat="(dataIndex, dataObj) in page.wishlist.data" class="card" style="margin: 1rem;">
+      <h4 class="card-title" style="margin: 10px;" ng-click="page.wishlist.toggleVisibility({dataIndex, 'type': 'type-1'})">
         <span class="material-icons">verified</span>
-        {{dataObj.type}}
+        <span>{{dataObj.type}}</span>
+        <span ng-show="!dataObj.visible" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">chevron_left</span>
+        <span ng-show="dataObj.visible" class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="">expand_more</span>
       </h4>
       <ul class="list-group list-group-flush">
-        <li ng-repeat="obj in dataObj.details" class="list-group-item">
+        <li ng-show="dataObj.visible" ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
           <div ng-click="onItemImportant(obj)">
@@ -170,16 +177,20 @@
         <div class="list-group" ng-repeat="(groupIndex, groupObj) in page.report.data.tableInfo.list">
           <a class="list-group-item list-group-item-action flex-column align-items-start" ng-click="page.report.toggleVisibility({groupIndex, 'type': 'type-2'});" style="background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{groupObj.group}}</h5>
-              <small>Group Total {{toIndianCurrency(groupObj.total)}}</small>
+              <h6 class="mb-1">
+                <span ng-show="!groupObj.visible" class="material-icons">arrow_right</span>
+                <span ng-show="groupObj.visible" class="material-icons">arrow_drop_down</span>
+                <span style="vertical-align: super;">{{groupObj.group}}</span>
+              </h6>
+              <small>Total {{toIndianCurrency(groupObj.total)}}</small>
             </div>
           </a>
           <a ng-show="groupObj.visible" class="list-group-item list-group-item-action flex-column align-items-start" ng-repeat="(itemIndex, itemObj) in groupObj.items" ng-click="page.report.toggleVisibility({groupIndex, itemIndex, 'type': 'type-1'});">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{itemObj.title}}</h5>
+              <h6 class="mb-1">{{itemObj.title}}</h6>
               <small>{{toIndianCurrency(itemObj.price)}}</small>
             </div>
-            <p class="mb-1">{{itemObj.quantity}}{{itemObj.unit}}</p>
+            <p class="mb-1"><small>{{itemObj.quantity}}{{itemObj.unit}}</small></p>
             <div ng-show="itemObj.visible">
               <span class="badge badge-success badge-pill">{{formatDate(itemObj.date, 'DD/MM/YYYY', 'Do MMM YYYY (dddd)')}}</span>
               <span class="badge badge-info badge-pill">{{itemObj.type}}</span>
@@ -264,6 +275,8 @@
   <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.showConfirm = false">close</span>
   <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.onConfirm()">done</span>
 </div>
+
+<p style="font-size: 0.75rem; margin: 20px 0px 5px 5px; color: #979797;">&#169;2023 : Chandan Koley, LSE Factset Researc Systems, under &#174;Ghar Kharach Applications&#8482;</p>
 
 </div>
 

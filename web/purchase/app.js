@@ -29,7 +29,13 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 }
             },
             searchSummary: '',
-            data: []
+            data: [],
+            toggleVisibility: function(info) {
+                if(info.type === 'type-1') {
+                    var visibility = $scope.page.wishlist.data[info.dataIndex].visible;
+                    $scope.page.wishlist.data[info.dataIndex].visible = visibility ? !visibility : true;
+                }
+            }
         },
         purchaselist: {
             search: {
@@ -172,7 +178,6 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 tableInfo: {}
             },
             toggleVisibility: function(info) {
-                console.log("toggle info details::", info);
                 if(info.type === 'type-1') {
                     var visibility = $scope.page.report.data.tableInfo.list[info.groupIndex].items[info.itemIndex].visible;
                     $scope.page.report.data.tableInfo.list[info.groupIndex].items[info.itemIndex].visible = visibility ? !visibility : true;
@@ -180,7 +185,6 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     var visibility = $scope.page.report.data.tableInfo.list[info.groupIndex].visible;
                     $scope.page.report.data.tableInfo.list[info.groupIndex].visible = visibility ? !visibility : true;
                 }
-                
             }
         }
     };

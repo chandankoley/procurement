@@ -171,10 +171,16 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 },
                 tableInfo: {}
             },
-            toggleVisibility: function(groupIndex, itemIndex) {
-                console.log("item details::", $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex]);
-                var visibility = $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex].visible;
-                $scope.page.report.data.tableInfo.list[groupIndex].items[itemIndex].visible = visibility ? !visibility : true;
+            toggleVisibility: function(info) {
+                console.log("toggle info details::", info);
+                if(info.type === 'type-1') {
+                    var visibility = $scope.page.report.data.tableInfo.list[info.groupIndex].items[info.itemIndex].visible;
+                    $scope.page.report.data.tableInfo.list[info.groupIndex].items[info.itemIndex].visible = visibility ? !visibility : true;
+                } else if(info.type === 'type-2') {
+                    var visibility = $scope.page.report.data.tableInfo.list[info.groupIndex].visible;
+                    $scope.page.report.data.tableInfo.list[info.groupIndex].visible = visibility ? !visibility : true;
+                }
+                
             }
         }
     };

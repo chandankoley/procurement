@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <head>
     <title>Ghar Kharach</title>
-    <!--<link rel = "icon" href="https://thumbs.dreamstime.com/b/indian-rupee-icon-sign-vector-162377406.jpg" type = "image/x-icon">-->
     <link rel = "icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRy8-c-hsI8999xIB2rtp99umKagfQ5p7VQUEvzQHxtWbyRGxAcQg7P1pZ_1vHc_3sLZM&usqp=CAU" type = "image/x-icon">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,6 +35,18 @@
   }
   .list-group-item {
     padding: 0.25rem 0.25rem !important;
+  }
+  .blur-popup-backgroud {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 99999;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #9c9b9bc2;
+    transition: 1s 0.4s;
   }
 </style>
 <body ng-app="purchaseApp" ng-controller="purchaseController">
@@ -191,6 +202,7 @@
             <div ng-show="itemObj.visible">
               <span class="badge badge-success badge-pill">{{formatDate(itemObj.date, 'DD/MM/YYYY', 'Do MMM YYYY (dddd)')}}</span>
               <span class="badge badge-info badge-pill">{{itemObj.type}}</span>
+              <span class="material-icons" style="vertical-align: middle;" ng-click="searchInPurchaseDetails(itemObj.id)">pageview</span>
               <div><small>{{itemObj.desc}}</small></div>
             </div>
           </a>
@@ -260,17 +272,26 @@
 </div>
 
 
-<div ng-if="alertHandler.showAlert === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px; z-index: 100;">
+<div ng-if="alertHandler.showAlert === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; max-width: 800px; bottom: 10px; z-index: 100;">
   {{alertHandler.message}}
   <button type="button" class="close" aria-label="Close" ng-click="alertHandler.showAlert = false">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 
-<div ng-if="confirmHandler.showConfirm === true" class="alert alert-warning" role="alert" style="position: fixed; width: 100%; bottom: 10px; z-index: 100;">
-  {{confirmHandler.message}}
-  <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.showConfirm = false">close</span>
-  <span class="material-icons" style="float: right; border: 1px solid; margin: 0px 0.5rem;" ng-click="confirmHandler.onConfirm()">done</span>
+<div ng-if="confirmHandler.showConfirm === true" class="blur-popup-backgroud">
+  <div style="background-color: white; margin: 150px 10px 0px 10px;">
+    <div style="background: linear-gradient(#f0f0f0,#c8c8c8); border-top: 1px solid #d3d3d3; padding: 5px;">
+      <span class="material-icons" style="vertical-align: bottom;">campaign</span>Notification
+    </div>
+    <div style="padding: 5px;">
+      {{confirmHandler.message}}
+    </div>
+    <div style="padding: 5px;">
+      <button type="button" class="btn btn-success btn-sm" ng-click="confirmHandler.onConfirm()"><span class="material-icons" style="vertical-align: bottom;">done</span>OK</button>
+      <button type="button" class="btn btn-secondary btn-sm" ng-click="confirmHandler.showConfirm = false"><span class="material-icons" style="vertical-align: bottom;">close</span>Cancel</button>
+    </div>
+  </div>
 </div>
 
 </div>

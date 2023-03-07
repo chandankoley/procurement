@@ -74,14 +74,14 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     edt: moment().format('YYYY-MM-DD'),
                     selectedTime: "1-M",
                     list: [
-                        {id: "1-M", value: "Last 1 Month"},
-                        {id: "15-D", value: "Last 15 Days"},
-                        {id: "7-D", value: "Last 7 Days"},
                         {id: "TD", value: "Today"},
-                        {id: "2-M", value: "Last 2 Months"},
-                        {id: "3-M", value: "Last Quarter"},
-                        {id: "6-M", value: "Last Half Year"},
-                        {id: "12-M", value: "Last Year"}
+                        {id: "3-D", value: "Last 3 Days"},
+                        {id: "7-D", value: "Last 7 Days"},
+                        {id: "15-D", value: "Last 15 Days"},
+                        {id: "1-M", value: "Last 1 Month"},
+                        {id: "3-M", value: "Last 3 Months"},
+                        {id: "6-M", value: "Last 6 Months"},
+                        {id: "12-M", value: "Last 1 Year"}
                     ],
                     onTimeRangeChange: function() {
                         if (this.selectedTime === 'TD') {
@@ -494,6 +494,25 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
             $scope.page.open = "purchase";
             $scope.page.purchaselist.search.findPurchasedItems({titleStrStrict: true});
         }
+    };
+
+    $scope.searchInPurchaseDetails = function(itemId) {
+        $scope.page.purchaselist.search.titleStr = '';
+        $scope.page.purchaselist.data = [];
+        $scope.page.open = "purchase";
+        var params = {
+            id: itemId
+        };
+        $scope.page.purchaselist.searchSummary = 'Searching your item. Please wait...';
+        dbData.getPurchaseItemList(params).then(function(res){
+            $scope.page.purchaselist.data = res.data;
+            $scope.page.purchaselist.searchSummary = 'Found ' + res.data.length + ' items according to your search filter' ;
+        }).catch(function(e){
+            console.error(e);
+            $scope.page.purchaselist.searchSummary = '';
+            $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
+            $scope.validateSession('api-error', e);
+        });
     };
 
     $scope.alertHandler = {

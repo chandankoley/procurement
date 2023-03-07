@@ -146,6 +146,9 @@ router.post('/api/get-purchase-item', function (req, res) {
             }
         });
     }
+    if(req.body.id) {
+        searchObj['id'] = new RegExp(`^${req.body.id}$`);
+    }
     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
         if (err) 
             res.sendStatus(500);

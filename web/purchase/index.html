@@ -118,9 +118,11 @@
 
     <div style="position:relative;">
       <div class="input-group mb-3" style="margin-bottom: 0px !important;">
-        <select class="custom-select" style="height: 40px;" id="typeSelection1" ng-model="page.purchaselist.search.timeRange.selectedTime" ng-change="page.purchaselist.search.timeRange.onTimeRangeChange()">
-          <option ng-repeat="obj in page.purchaselist.search.timeRange.list" value="{{obj.id}}">{{obj.value}}</option>
-        </select>
+        <div class="input-group-prepend">
+          <select class="custom-select" style="height: 40px;" id="typeSelection1" ng-model="page.purchaselist.search.timeRange.selectedTime" ng-change="page.purchaselist.search.timeRange.onTimeRangeChange()">
+            <option ng-repeat="obj in page.purchaselist.search.timeRange.list" value="{{obj.id}}">{{obj.value}}</option>
+          </select>
+        </div>
         <input type="text" ng-model="page.purchaselist.search.titleStr" ng-keyup="page.purchaselist.search.updatetitleTypeaheadSearchedItems()" class="form-control" placeholder="Type item title" aria-label="Item name" aria-describedby="basic-addon2">
         <button type="button" class="btn btn-primary btn-sm" ng-click="page.purchaselist.search.findPurchasedItems()">
           <span class="material-icons">search</span> 
@@ -133,7 +135,7 @@
           <span style="float: right;" class="material-icons" ng-click="page.purchaselist.search.titleTypeaheadSearchedItems = []">cancel</span>
         </div>
         <div id="searchlist-display">
-          <div ng-repeat="item in page.purchaselist.search.titleTypeaheadSearchedItems" ng-click="page.purchaselist.search.titleStr = item; page.purchaselist.search.titleTypeaheadSearchedItems = [];" style="margin: 0.25rem; border: 1px solid lightgrey; padding: 0.5rem; border-radius: 10px;">
+          <div ng-repeat="item in page.purchaselist.search.titleTypeaheadSearchedItems" ng-click="page.purchaselist.search.handleTypeaheadItemSelection(item);" style="margin: 0.25rem; border: 1px solid lightgrey; padding: 0.5rem; border-radius: 10px;">
             {{item}}
           </div>
         </div>
@@ -280,15 +282,15 @@
 </div>
 
 <div ng-if="confirmHandler.showConfirm === true" class="blur-popup-backgroud">
-  <div style="background-color: white; margin: 150px 10px 0px 10px;">
+  <div style="background-color: white; max-width: fit-content; margin: 20% auto; border-radius: 5px;">
     <div style="background: linear-gradient(#f0f0f0,#c8c8c8); border-top: 1px solid #d3d3d3; padding: 5px;">
       <span class="material-icons" style="vertical-align: bottom;">campaign</span>Notification
     </div>
     <div style="padding: 5px;">
       {{confirmHandler.message}}
     </div>
-    <div style="padding: 5px;">
-      <button type="button" class="btn btn-success btn-sm" ng-click="confirmHandler.onConfirm()"><span class="material-icons" style="vertical-align: bottom;">done</span>OK</button>
+    <div class="d-flex justify-content-end" style="padding: 5px;">
+      <button style="margin-right: 5px;" type="button" class="btn btn-success btn-sm" ng-click="confirmHandler.onConfirm()"><span class="material-icons" style="vertical-align: bottom;">done</span>OK</button>
       <button type="button" class="btn btn-secondary btn-sm" ng-click="confirmHandler.showConfirm = false"><span class="material-icons" style="vertical-align: bottom;">close</span>Cancel</button>
     </div>
   </div>

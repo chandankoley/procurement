@@ -55,16 +55,16 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 updatetitleTypeaheadSearchedItems: function() {
                     var _this = this;
                     if(_this.titleStr !== '') {
-                        clearTimeout(this.timeout);
-                        this.timeout = setTimeout(function() {
+                        //clearTimeout(this.timeout);
+                        //this.timeout = setTimeout(function() {
                             $scope.page.purchaselist.search.titleTypeaheadSearchedItems = _.reduce(_this.titleTypeaheadList, function(memo, item){
                                 if(item.toLowerCase().indexOf(_this.titleStr.toLowerCase()) >= 0 && memo.length <= 10) {
                                     memo.push(item);
                                 }
                                 return memo;
                             }, []);
-                            $scope.$apply();
-                        }, 500);
+                            //$scope.$apply();
+                        //}, 500);
                     } else {
                         $scope.page.purchaselist.search.titleTypeaheadSearchedItems = [];
                     }
@@ -115,6 +115,11 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                         $scope.alertHandler.triggerAlert('Search failed due to server issue', 5);
                         $scope.validateSession('api-error', e);
                     });
+                },
+                handleTypeaheadItemSelection: function(item) {
+                    $scope.page.purchaselist.search.titleStr = item; 
+                    $scope.page.purchaselist.search.titleTypeaheadSearchedItems = [];
+                    $scope.page.purchaselist.search.findPurchasedItems();
                 }
             },
             searchSummary: '',

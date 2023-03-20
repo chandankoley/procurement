@@ -223,6 +223,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     {id: "pc", value: "Piece"},
                     {id: "kg", value: "Kg"},
                     {id: "litre", value: "Litre"},
+                    {id: "bottle", value: "Bottle"},
                     {id: "NA", value: "NA"}
                 ]
             },
@@ -387,7 +388,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     title: this.title,
                     type: this.type,
                     desc: this.desc,
-                    important: 'false'
+                    important: this.important
                 }
                 dbData.deleteWishItem({id: params.id}).then(function(){
                     return dbData.addWishItem(params);
@@ -481,7 +482,9 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
         singleClick: function(itemObj) {
             $timeout(function() {
                 if($scope.onWishItemClickHandler.processFlag === true) {
-                    var isImportant = itemObj.important && itemObj.important === 'true' ? 'false' : 'true'
+                    var isImportant = itemObj.important && itemObj.important === 'true' ? 'false' : 'true';
+                    itemObj.important_inprocess = 'true';
+                    itemObj.important = 'false';
                     dbData.updateWishImportantFlag({id: itemObj.id, isImportant: isImportant}).then(function(){
                         $scope.page.wishlist.search.findWishlistItems();
                     }).catch(function(e){

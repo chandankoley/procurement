@@ -105,6 +105,7 @@
         <li ng-show="page.wishlist.dataTypeVisibilityMap[dataObj.type]" ng-repeat="obj in dataObj.details" class="list-group-item">
           <span class="material-icons" style="vertical-align: middle; margin-left: 5px; float: right;" ng-click="onItemDelete(obj, 'wish');">delete_forever</span>
           <span class="material-icons" ng-click="newItemDialog.loadItemDetailsDialog(obj, 'edit-wishlist');" style="vertical-align: middle; margin-left: 5px; float: right;" data-toggle = "modal" data-target = "#shoppingItem">build</span>
+          <span ng-show="obj.important_inprocess === 'true'" class="material-icons">published_with_changes</span>
           <span ng-show="obj.important === 'true'" class="material-icons">task_alt</span>
           <span ng-click="onWishItemClickHandler.singleClick(obj)" ng-dblclick="onWishItemClickHandler.doubleClick(obj.title);" style="vertical-align: super;">{{obj.title}}</span>
           <div style="color: #9f9f9f; font-size: 0.75rem;">{{obj.desc}}</div>
@@ -226,14 +227,20 @@
     </div>
     <div class="modal-body">
 
-      <input type="text" ng-model="newItemDialog.title" class="form-control" placeholder="Item name" aria-label="Item name" aria-describedby="basic-addon2">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend" style="width: 40%;">
+          <select class="custom-select" id="typeSelection" ng-model="newItemDialog.type">
+            <option ng-repeat="obj in newItemDialog.formOptions.itemType.list" value="{{obj.id}}">{{obj.value}}</option>
+          </select>
+        </div>
+        <input type="text" ng-model="newItemDialog.title" class="form-control" placeholder="Item name" aria-label="Item name" aria-describedby="basic-addon2">
+      </div>
 
       <textarea style="margin: 1rem 0px;" class="form-control" aria-label="With textarea" placeholder="Item Description" ng-model="newItemDialog.desc"></textarea>
 
+      <div style="color: white; font-size: small; margin: 5px auto; background-color: red;"> Below fields are only applicable for purchase. </div>
+
       <div class="input-group mb-3">
-        <select class="custom-select" id="typeSelection" ng-model="newItemDialog.type">
-          <option ng-repeat="obj in newItemDialog.formOptions.itemType.list" value="{{obj.id}}">{{obj.value}}</option>
-        </select>
         <input type="number" ng-model="newItemDialog.quantity" class="form-control" placeholder="Total unit" aria-label="Recipient's username" aria-describedby="basic-addon2">
         <select class="custom-select" id="measurementUnit" ng-model="newItemDialog.unit">
           <option ng-repeat="obj in newItemDialog.formOptions.itemUnit.list" value="{{obj.id}}">{{obj.value}}</option>
@@ -245,7 +252,6 @@
         <input type="number" ng-model="newItemDialog.price" class="form-control" placeholder="Price" aria-label="Recipient's username" aria-describedby="basic-addon2">
       </div>
 
-      <span style="color: red; font-size: x-small;margin-top: 5px;">**Only Item title, type and decription will get added in wishlist.</span>
     </div>
     <div class="modal-footer">
       <button ng-if="newItemDialog.formOptions.isButtonVisible.addNewPurchase" type="button" class="btn btn-success btn-sm" data-dismiss="modal" ng-click="newItemDialog.addPurchaseItem();">

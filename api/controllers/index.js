@@ -13,6 +13,7 @@ const LOGIN_TABLE = "login";
 const WISH_TABLE = "wish";
 const MAX_OTP_TRY_COUNT = 3;
 const SESSION_TIME_FORMAT = "YYYYMMDDHHmmss";
+const MAX_SESSION_TIME_IN_DAY = 7;
 
 var mailer = require("../models/mailer");
 
@@ -77,7 +78,7 @@ router.post('/api/verify-otp', function (req, res) {
                     MongoClient.connect(process.env.MONGO_URL, function(err, db) {
                         if (err) 
                             res.sendStatus(500);
-                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {'passcode': passcode, 'session_time': moment().add(1, 'days').format(SESSION_TIME_FORMAT)}}, function(err) {
+                            db.db(DB_NAME).collection(LOGIN_TABLE).updateOne({user_id: encodeURIComponent(req.body.user_id)}, { $set: {'passcode': passcode, 'session_time': moment().add(MAX_SESSION_TIME_IN_DAY, 'days').format(SESSION_TIME_FORMAT)}}, function(err) {
                             if (err) 
                                 res.sendStatus(500);
                             else
@@ -215,7 +216,7 @@ router.get('/api/get-wish-item', function (req, res) {
                 } else {
                     dbData = _.chain(dbData).orderBy(['type', 'title'], ['asc', 'asc']).reduce(function(memo, obj) {
                         var formattedType = obj.type.charAt(0).toUpperCase() + obj.type.slice(1);
-                        var index = _.findIndex(memo, {'type': formattedType});
+                        var index = obj.important === 'true' ? 0 : _.findIndex(memo, {'type': formattedType});
                         if(index >= 0){
                             memo[index].details.push(obj);
                         } else {
@@ -225,7 +226,7 @@ router.get('/api/get-wish-item', function (req, res) {
                             });
                         }
                         return memo;
-                    }, []).value();
+                    }, [{'type': 'Important', 'details': []}]).value();
                     res.send(dbData);
                 }
                 db.close();

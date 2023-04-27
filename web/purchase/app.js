@@ -203,7 +203,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
         date: "",
         type: "grocery",
         quantity: 0,
-        unit: "pc",
+        unit: "kg",
         price: 0,
         formOptions: {
             itemType: {
@@ -215,6 +215,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                     {id: "non-veg", value: "Non-veg"},
                     {id: "automobile", value: "Automobile"},
                     {id: "entertainment", value: "Entertainment"},
+                    {id: "travel", value: "Travel"},
                     {id: "others", value: "Others"}
                 ]
             },
@@ -244,7 +245,7 @@ app.controller('purchaseController', function ($scope, $timeout, $window, dbData
                 //this.type = this.formOptions.itemType.list[0].id;  keeping last type as default
                 this.quantity = 1;
                 this.unit = this.formOptions.itemUnit.list[0].id;
-                this.price = 100;
+                this.price = 1;
                 this.formOptions.isButtonVisible.addNewPurchase = true;
                 this.formOptions.isButtonVisible.addNewWish = true;
                 this.formOptions.isButtonVisible.editPurchase = false;
